@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pastel To-Do List</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Estilo claro con tonos pastel */
+    body {
+      background-color: #f9f9f9; /* Fondo claro */
+      color: #333;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #7b68ee; /* Lila pastel */
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    #add-task {
+      background-color: #7b68ee; /* Lila pastel */
+      border: none;
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    #add-task:hover {
+      background-color: #6a5acd; /* Lila oscuro */
+    }
+
+    .list-group-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .list-group-item.completed span.task-text {
+      text-decoration: line-through;
+      color: #ccc;
+    }
+
+    .list-group-item input[type="checkbox"] {
+      accent-color: #7b68ee; /* Color del checkbox */
+      margin-right: 10px;
+    }
+
+    .task-time {
+      font-size: 0.9rem;
+      color: #6c757d; /* Gris suave */
+    }
+
+    .delete-button {
+      background-color: #e74c3c; /* Rojo pastel */
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .delete-button:hover {
+      background-color: #c0392b; /* Rojo más oscuro */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>To-Do List</h1>
+
+    <div class="input-group">
+      <input type="text" id="task-input" class="form-control" placeholder="Enter a task...">
+      <select id="task-time" class="form-select">
+        <!-- Opciones generadas dinámicamente en JavaScript -->
+      </select>
+      <button id="add-task" class="btn">Add Task</button>
+    </div>
+
+    <ul id="todo-list" class="list-group"></ul>
+  </div>
+
+  <!-- Bootstrap JS and Popper.js (optional for advanced components) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
