@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RHV - Bitácora de Tareas & Proyectos</title>
+  <title>RHV - Sistema Integrado: Horario & Bitácora Técnica</title>
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'><path d='M2 12h20M12 2v20M7 7l10 10M17 7L7 17'/></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'><path d='M2 12h20M12 2v20M7 7l10 10M17 7L7 17'/></svg>">
   <!-- Fonts: JetBrains Mono (técnica) + Plus Jakarta Sans (interfaz) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,19 +21,16 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    .font-mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .font-sans {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
 
     /* Fondo Modo Oscuro: Blueprint Night */
     .dark .bg-grid-blueprint {
-      background-color: #0f172a;
+      background-color: #0b1329;
       background-image: 
-        linear-gradient(to right, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+        linear-gradient(to right, rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.08) 1px, transparent 1px),
         linear-gradient(to right, rgba(255, 255, 255, 0.03) 5px, transparent 5px),
         linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 5px, transparent 5px);
       background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
@@ -43,14 +40,14 @@
     .bg-grid-blueprint {
       background-color: #f8fafc;
       background-image: 
-        linear-gradient(to right, rgba(148, 163, 184, 0.2) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(148, 163, 184, 0.2) 1px, transparent 1px),
-        linear-gradient(to right, rgba(100, 116, 139, 0.1) 5px, transparent 5px),
-        linear-gradient(to bottom, rgba(100, 116, 139, 0.1) 5px, transparent 5px);
+        linear-gradient(to right, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
+        linear-gradient(to right, rgba(100, 116, 139, 0.12) 5px, transparent 5px),
+        linear-gradient(to bottom, rgba(100, 116, 139, 0.12) 5px, transparent 5px);
       background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
     }
 
-    /* Regla / Cota lateral */
+    /* Cota / Regla de trazado */
     .blueprint-margin::before {
       content: '';
       position: absolute;
@@ -61,27 +58,16 @@
       z-index: 0;
       pointer-events: none;
     }
-    .dark .blueprint-margin::before {
-      background-color: rgba(56, 189, 248, 0.25);
-    }
-    .blueprint-margin::before {
-      background-color: rgba(30, 41, 59, 0.2);
-    }
+    .dark .blueprint-margin::before { background-color: rgba(56, 189, 248, 0.25); }
+    .blueprint-margin::before { background-color: rgba(30, 41, 59, 0.2); }
 
-    /* Tarjetas de Tarea estilo Ficha de Proyecto */
+    /* Tarjetas de Tarea y Celdas estilo Ficha CAD */
     .blueprint-card {
       position: relative;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
-    .dark .blueprint-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-    }
-    .blueprint-card {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-    }
+    .dark .blueprint-card { background: #1e293b; border: 1px solid #334155; }
+    .blueprint-card { background: #ffffff; border: 1px solid #cbd5e1; }
 
     .dark .blueprint-card:hover {
       border-color: #38bdf8;
@@ -93,213 +79,590 @@
       transform: translateY(-2px);
     }
 
-    /* Cota visual lateral en hover */
-    .blueprint-card::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      transition: background 0.2s;
-    }
-    .dark .blueprint-card::after { background: #334155; }
-    .blueprint-card::after { background: #cbd5e1; }
+    /* Estilos de materias para Modo Claro / Modo Oscuro */
+    .cell-eso-a { background-color: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+    .dark .cell-eso-a { background-color: #1e1b4b; color: #a5b4fc; border-color: #312e81; }
+
+    .cell-eso-b { background-color: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    .dark .cell-eso-b { background-color: #052e16; color: #86efac; border-color: #14532d; }
+
+    .cell-eso-c1 { background-color: #e0f2fe; color: #075985; border-color: #bae6fd; }
+    .dark .cell-eso-c1 { background-color: #0c4a6e; color: #7dd3fc; border-color: #0369a1; }
+
+    .cell-eso-c2 { background-color: #ccfbf1; color: #115e59; border-color: #99f6e4; }
+    .dark .cell-eso-c2 { background-color: #042f2e; color: #5eead4; border-color: #134e4a; }
+
+    .cell-eso-d { background-color: #fef9c3; color: #854d0e; border-color: #fef08a; }
+    .dark .cell-eso-d { background-color: #422006; color: #fde047; border-color: #713f12; }
+
+    .cell-guardia { background-color: #ffe4e6; color: #9f1239; border-color: #fecdd3; }
+    .dark .cell-guardia { background-color: #4c0519; color: #fda4af; border-color: #881337; }
+
+    .cell-tutoria { background-color: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
+    .dark .cell-tutoria { background-color: #500724; color: #f472b6; border-color: #831843; }
+
+    .cell-gestion { background-color: #f1f5f9; color: #334155; border-color: #e2e8f0; }
+    .dark .cell-gestion { background-color: #0f172a; color: #94a3b8; border-color: #1e293b; }
+
     
-    .dark .blueprint-card:hover::after { background: #38bdf8; }
-    .blueprint-card:hover::after { background: #0284c7; }
   </style>
 </head>
 <body class="bg-grid-blueprint blueprint-margin font-sans text-slate-800 dark:text-slate-200 min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white transition-colors duration-200">
 
-  <!-- Capa principal -->
+  <!-- Contenedor Principal -->
   <div class="relative z-10 flex-grow">
-    <!-- Header Principal con estética de Cajetín Técnico superior -->
-    <header class="bg-white/90 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-300 dark:border-slate-800 sticky top-0 z-30 shadow-sm dark:shadow-xl transition-colors duration-200">
-      <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-          <div class="bg-sky-500/10 border border-sky-500/30 p-2.5 rounded-lg text-sky-600 dark:text-sky-400">
-            <i data-lucide="compass" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <div class="flex items-center space-x-2">
-              <h1 class="font-bold text-base md:text-lg text-slate-900 dark:text-slate-100 tracking-tight font-mono">RHV // BITÁCORA TÉCNICA</h1>
-              <span class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-200 dark:bg-slate-800 text-sky-700 dark:text-sky-400 border border-slate-300 dark:border-slate-700 rounded">v2.5</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 dark:animate-pulse"></span>
-              <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400">SHEETS_DB_SYNC: OK</span>
-            </div>
-          </div>
-        </div>
+
+    <!-- Encabezado / Cajetín Principal -->
+    <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-300 dark:border-slate-800 sticky top-0 z-40 shadow-sm dark:shadow-2xl transition-colors duration-200">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
         
-        <div class="flex items-center space-x-2 sm:space-x-3">
-          <!-- Botón de Modo Claro / Oscuro -->
+        <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
+          <div class="flex items-center space-x-3">
+            <div class="bg-sky-500/10 border border-sky-500/30 p-2.5 rounded-lg text-sky-600 dark:text-sky-400 shadow-xs">
+              <i data-lucide="compass" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h1 class="font-bold text-base md:text-lg text-slate-900 dark:text-slate-100 tracking-tight font-mono">RHV // SISTEMA INTEGRADO</h1>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400 border border-sky-300 dark:border-sky-800 rounded">REV. 26/27</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 dark:animate-pulse"></span>
+                <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400">PLANOS DE AULA & BITÁCORA SYNC</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón Modo Oscuro Móvil -->
+          <button onclick="toggleTheme()" title="Cambiar tema" class="sm:hidden p-2 text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded border border-slate-300 dark:border-slate-700">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-amber-600"></i>
+          </button>
+        </div>
+
+        <!-- Selector de Pestañas Tipo Módulo CAD -->
+        <div class="flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-300 dark:border-slate-800 font-mono text-xs w-full sm:w-auto">
+          <button onclick="switchTab('horario')" id="navTabHorario" class="flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>TAB-01: HORARIO</span>
+          </button>
+          <button onclick="switchTab('bitacora')" id="navTabBitacora" class="flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2">
+            <i data-lucide="list-todo" class="w-4 h-4"></i>
+            <span>TAB-02: BITÁCORA</span>
+            <span id="tabBadgeTasks" class="bg-slate-300 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] px-1.5 py-0.2 rounded-full ml-1">0</span>
+          </button>
+        </div>
+
+        <div class="hidden sm:flex items-center space-x-2">
           <button onclick="toggleTheme()" title="Cambiar tema" class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-300 dark:border-slate-700 transition">
             <i data-lucide="moon" id="themeIconDark" class="w-4 h-4 hidden dark:block"></i>
             <i data-lucide="sun" id="themeIconLight" class="w-4 h-4 block dark:hidden text-amber-600"></i>
           </button>
 
-          <button onclick="toggleForm()" class="flex items-center space-x-2 text-xs bg-sky-600 hover:bg-sky-500 text-white px-3.5 sm:px-4 py-2.5 rounded-md font-mono font-medium transition border border-sky-400/30 shadow-md">
-            <i data-lucide="plus-square" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">NUEVO REGISTRO</span>
-          </button>
-
-          <button onclick="fetchTasks()" title="Sincronizar" class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-300 dark:border-slate-700 transition">
+          <button onclick="fetchTasks()" title="Sincronizar Datos" class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-300 dark:border-slate-700 transition flex items-center gap-1.5 font-mono text-xs">
             <i data-lucide="refresh-cw" id="syncIcon" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
 
-      <!-- Resumen / Métricas Rápidas en Bloques de Cota -->
-      <section class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg relative overflow-hidden shadow-xs transition-colors duration-200">
-          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider mb-1">
-            <span>[TOTAL_PEND]</span>
-            <i data-lucide="layers" class="w-4 h-4 text-slate-400 dark:text-slate-500"></i>
+      <!-- =================================================================== -->
+      <!-- TAB 1: HORARIO LECTIVO TÉCNICO -->
+      <!-- =================================================================== -->
+      <section id="tabHorario" class="space-y-6">
+        
+        <!-- Indicadores Rápidos de Carga Horaria -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase mb-1">
+              <span>[DOCENCIA_DIRECTA]</span>
+              <i data-lucide="book-open" class="w-4 h-4 text-sky-500"></i>
+            </div>
+            <p class="text-2xl font-bold text-slate-900 dark:text-slate-100">14 H</p>
+            <div class="text-[10px] text-slate-500 mt-0.5">2º ESO (A, B, C, D)</div>
           </div>
-          <p id="statTotal" class="text-2xl font-bold text-slate-900 dark:text-slate-100">0</p>
-          <div class="text-[10px] text-slate-500 mt-1">Registros activos</div>
+
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-300 dark:border-rose-900/40 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-rose-600 dark:text-rose-400 text-[10px] uppercase mb-1">
+              <span>[GUARDIAS]</span>
+              <i data-lucide="shield-alert" class="w-4 h-4"></i>
+            </div>
+            <p class="text-2xl font-bold text-rose-600 dark:text-rose-400">3 H</p>
+            <div class="text-[10px] text-rose-600/80 dark:text-rose-500/80 mt-0.5">Aula + Recreo ESO</div>
+          </div>
+
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-pink-300 dark:border-pink-900/40 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-pink-600 dark:text-pink-400 text-[10px] uppercase mb-1">
+              <span>[TUTORÍAS]</span>
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </div>
+            <p class="text-2xl font-bold text-pink-600 dark:text-pink-400">2 H</p>
+            <div class="text-[10px] text-pink-600/80 dark:text-pink-500/80 mt-0.5">Atención 2º ESO C</div>
+          </div>
+
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase mb-1">
+              <span>[GESTIÓN_PLAN]</span>
+              <i data-lucide="folder-git2" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <p class="text-2xl font-bold text-slate-900 dark:text-slate-100">3 H</p>
+            <div class="text-[10px] text-slate-500 mt-0.5">REDEP & Coordinación</div>
+          </div>
         </div>
 
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-300 dark:border-rose-900/40 p-3.5 rounded-lg relative overflow-hidden shadow-xs transition-colors duration-200">
-          <div class="flex items-center justify-between text-rose-700 dark:text-rose-400 text-[10px] uppercase tracking-wider mb-1">
-            <span>[PRIORIDAD_CRÍT]</span>
-            <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600 dark:text-rose-400"></i>
+        <!-- Tabla Estilo Plano de Distribución / Horario -->
+        <div class="bg-white/95 dark:bg-slate-900/95 border border-slate-300 dark:border-slate-800 rounded-xl p-4 md:p-6 shadow-xl relative overflow-hidden transition-colors duration-200">
+          
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4 mb-4 font-mono">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <i data-lucide="layout-grid" class="w-5 h-5 text-sky-500"></i> DISTRIBUCIÓN SEMANAL DE CARGA LECTIVA
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">PLANO TÉCNICO // CURSO 2026-2027</p>
+            </div>
+            <div class="text-[11px] bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded text-slate-600 dark:text-slate-300">
+              CÓDIGO: <span class="text-sky-600 dark:text-sky-400 font-bold">HOR-TYD-2627</span>
+            </div>
           </div>
-          <p id="statHigh" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</p>
-          <div class="text-[10px] text-rose-600/80 dark:text-rose-500/80 mt-1">Acción inmediata</div>
-        </div>
 
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-amber-300 dark:border-amber-900/40 p-3.5 rounded-lg relative overflow-hidden shadow-xs transition-colors duration-200">
-          <div class="flex items-center justify-between text-amber-700 dark:text-amber-400 text-[10px] uppercase tracking-wider mb-1">
-            <span>[POR_VENCER]</span>
-            <i data-lucide="clock" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
-          </div>
-          <p id="statDue" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</p>
-          <div class="text-[10px] text-amber-700/80 dark:text-amber-500/80 mt-1">Fecha límite alcanzada</div>
-        </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-center border-collapse font-mono text-xs min-w-[700px]">
+              <thead>
+                <tr class="bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-b-2 border-slate-300 dark:border-slate-800">
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-28">FRANJA / HORA</th>
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">LUNES</th>
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">MARTES</th>
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">MIÉRCOLES</th>
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">JUEVES</th>
+                  <th class="p-3 w-1/5">VIERNES</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                
+                <!-- 08:15 - 09:15 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">08:15 - 09:15</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO A / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(30 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO B / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(33 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO B / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(33 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C1 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C1 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
+                    </div>
+                  </td>
+                </tr>
 
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-sky-300 dark:border-sky-900/40 p-3.5 rounded-lg relative overflow-hidden shadow-xs transition-colors duration-200">
-          <div class="flex items-center justify-between text-sky-700 dark:text-sky-400 text-[10px] uppercase tracking-wider mb-1">
-            <span>[MÓDULOS]</span>
-            <i data-lucide="grid" class="w-4 h-4 text-sky-600 dark:text-sky-400"></i>
+                <!-- 09:15 - 10:15 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">09:15 - 10:15</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-guardia p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>GUARDIA</span>
+                        <button onclick="createTaskFromSchedule('Guardia 1ª Hora Lunes', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Servicio de Guardia</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-guardia p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>GUARDIA</span>
+                        <button onclick="createTaskFromSchedule('Guardia 2ª Hora Martes', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Servicio de Guardia</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO A / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(30 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-tutoria p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>TUTORÍA LECTIVA</span>
+                        <button onclick="createTaskFromSchedule('Tutoría 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">2º ESO C (30 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO A / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(30 alumn.)</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- 10:15 - 11:15 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">10:15 - 11:15</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO D / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(27 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO D / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(27 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C1 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>PLAN DE CENTRO</span>
+                        <button onclick="createTaskFromSchedule('Plan de Centro', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Otras Activ. Lectivas</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO B / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(33 alumn.)</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- RECREO: 11:15 - 11:45 -->
+                <tr class="bg-slate-100/60 dark:bg-slate-950/60">
+                  <td class="p-2 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800 text-[10px]">11:15 - 11:45</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-guardia p-1.5 rounded border text-[10px] font-bold">GUARDIA RECREO (ESO)</div>
+                  </td>
+                  <td colspan="4" class="p-2 text-slate-400 dark:text-slate-600 text-[10px] font-mono uppercase tracking-widest">// DESCANSO LECTIVO / RECREO //</td>
+                </tr>
+
+                <!-- 11:45 - 12:45 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">11:45 - 12:45</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-tutoria p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>TUTORÍA ATENCIÓN</span>
+                        <button onclick="createTaskFromSchedule('Atención Familias 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Personalizada 2º ESO C</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C2 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700 text-[10px]">- LIBRE -</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C2 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>PROGRAMACIÓN</span>
+                        <button onclick="createTaskFromSchedule('Programación de Actividades', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Actividades Educativas</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- 12:45 - 13:45 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">12:45 - 13:45</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>COORDINACIÓN</span>
+                        <button onclick="createTaskFromSchedule('Coordinación Docente / Materiales', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Docente / Materiales</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700 text-[10px]">- LIBRE -</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>REDEP</span>
+                        <button onclick="createTaskFromSchedule('Reunión REDEP', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Red de Profesorado</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO D / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(27 alumn.)</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C2 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- 13:45 - 14:45 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">13:45 - 14:45</td>
+                  <td colspan="5" class="p-2 text-slate-400 dark:text-slate-700 text-[10px] font-mono tracking-widest">// SIN CARGA LECTIVA ASIGNADA //</td>
+                </tr>
+
+              </tbody>
+            </table>
           </div>
-          <p id="statCat" class="text-2xl font-bold text-sky-600 dark:text-sky-400">0</p>
-          <div class="text-[10px] text-sky-700/80 dark:text-sky-500/80 mt-1">Categorías de proyecto</div>
+
+          <!-- Leyenda Técnica de Capas/Colores -->
+          <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-3 font-mono text-[11px]">
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-a inline-block border"></span> 2º ESO A</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-b inline-block border"></span> 2º ESO B</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-c1 inline-block border"></span> 2º ESO C1</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-c2 inline-block border"></span> 2º ESO C2</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-d inline-block border"></span> 2º ESO D</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-guardia inline-block border"></span> Guardias</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-tutoria inline-block border"></span> Tutorías</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-gestion inline-block border"></span> Coordinación / Gestión</div>
+          </div>
+
         </div>
       </section>
 
-      <!-- Formulario Plegable para Nueva Tarea -->
-      <section id="formContainer" class="hidden transition-all duration-300">
-        <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-6 shadow-xl dark:shadow-2xl relative transition-colors duration-200">
-          <div class="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
-            <h2 class="text-sm font-mono font-bold text-sky-700 dark:text-sky-400 flex items-center gap-2 uppercase tracking-wide">
-              <i data-lucide="pen-tool" class="w-4 h-4 text-sky-600 dark:text-sky-400"></i> // Entrada de Especificación Técnica
-            </h2>
-            <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded">
-              <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+      <!-- =================================================================== -->
+      <!-- TAB 2: BITÁCORA TÉCNICA DE TAREAS -->
+      <!-- =================================================================== -->
+      <section id="tabBitacora" class="hidden space-y-6">
+        
+        <!-- Métricas de Bitácora -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase mb-1">
+              <span>[TOTAL_PENDIENTES]</span>
+              <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
+            </div>
+            <p id="statTotal" class="text-2xl font-bold text-slate-900 dark:text-slate-100">0</p>
+            <div class="text-[10px] text-slate-500 mt-0.5">Registros activos</div>
           </div>
-          
-          <form id="taskForm" class="space-y-4 font-mono text-xs">
-            <div>
-              <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Descripción del Requerimiento / Tarea</label>
-              <input type="text" id="descripcion" placeholder="Ej: Revisión de cálculo estructural / Entrega de memoria..." required 
-                     class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-sky-500 text-sm transition">
+
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-300 dark:border-rose-900/40 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-rose-600 dark:text-rose-400 text-[10px] uppercase mb-1">
+              <span>[PRIORIDAD_CRÍTICA]</span>
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Categoría / Módulo</label>
-                <select id="categoria" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
-                  <option value="Clases">📐 Clases / Docencia</option>
-                  <option value="Tutoría">👤 Tutoría / Revisión</option>
-                  <option value="Gestión">💼 Gestión / Proyecto</option>
-                  <option value="Otros">📌 Inspección / Otros</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Nivel de Prioridad</label>
-                <select id="prioridad" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
-                  <option value="Alta">🔴 Alta [Crítica]</option>
-                  <option value="Media" selected>🟡 Media [Estándar]</option>
-                  <option value="Baja">🟢 Baja [Secundaria]</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Fecha Límite [Deadline]</label>
-                <input type="date" id="fechaLimite" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
-              </div>
+            <p id="statHigh" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</p>
+            <div class="text-[10px] text-rose-600/80 dark:text-rose-500/80 mt-0.5">Acción inmediata</div>
+          </div>
+
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-amber-300 dark:border-amber-900/40 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-amber-600 dark:text-amber-400 text-[10px] uppercase mb-1">
+              <span>[POR_VENCER]</span>
+              <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i>
             </div>
-            <div class="flex justify-end space-x-3 pt-3 border-t border-slate-200 dark:border-slate-800">
-              <button type="button" onclick="toggleForm()" class="px-4 py-2 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancelar</button>
-              <button type="submit" id="submitBtn" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-5 py-2.5 rounded transition shadow-md flex items-center space-x-2">
-                <i data-lucide="check-square" class="w-4 h-4"></i>
-                <span>REGISTRAR EN BITÁCORA</span>
+            <p id="statDue" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</p>
+            <div class="text-[10px] text-amber-700/80 dark:text-amber-500/80 mt-0.5">Fecha límite alcanzada</div>
+          </div>
+
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-sky-300 dark:border-sky-900/40 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-sky-600 dark:text-sky-400 text-[10px] uppercase mb-1">
+              <span>[MÓDULOS]</span>
+              <i data-lucide="grid" class="w-4 h-4 text-sky-500"></i>
+            </div>
+            <p id="statCat" class="text-2xl font-bold text-sky-600 dark:text-sky-400">0</p>
+            <div class="text-[10px] text-sky-700/80 dark:text-sky-500/80 mt-0.5">Categorías de proyecto</div>
+          </div>
+        </div>
+
+        <!-- Formulario Plegable para Nueva Tarea -->
+        <section id="formContainer" class="transition-all duration-300">
+          <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl p-6 shadow-xl relative transition-colors duration-200">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
+              <h2 class="text-sm font-mono font-bold text-sky-700 dark:text-sky-400 flex items-center gap-2 uppercase tracking-wide">
+                <i data-lucide="pen-tool" class="w-4 h-4 text-sky-500"></i> // Entrada de Especificación Técnica
+              </h2>
+              <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded">
+                <i data-lucide="x" class="w-5 h-5"></i>
               </button>
             </div>
-          </form>
-        </div>
-      </section>
-
-      <!-- Navegación por Filtros Técnicos -->
-      <section class="space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3 gap-3">
-          <div class="flex space-x-2 font-mono text-xs">
-            <button onclick="setFilter('all')" id="tabAll" class="px-3 py-1.5 rounded-md font-semibold transition bg-sky-600 text-white border border-sky-400/30">
-              [TODAS]
-            </button>
-            <button onclick="setFilter('Alta')" id="tabHigh" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent">
-              [ALTA_PRIORIDAD]
-            </button>
-            <button onclick="setFilter('Urgent')" id="tabUrgent" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent">
-              [POR_VENCER]
-            </button>
+            
+            <form id="taskForm" class="space-y-4 font-mono text-xs">
+              <div>
+                <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Descripción del Requerimiento / Tarea</label>
+                <input type="text" id="descripcion" placeholder="Ej: Corregir exámen 2º ESO A / Preparar memoria de taller..." required 
+                       class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-sky-500 text-sm transition">
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Categoría / Módulo</label>
+                  <select id="categoria" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                    <option value="Clases">📐 Clases / Docencia</option>
+                    <option value="Tutoría">👤 Tutoría / Atención</option>
+                    <option value="Gestión">💼 Gestión / Coordinación</option>
+                    <option value="Otros">📌 Inspección / Otros</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Nivel de Prioridad</label>
+                  <select id="prioridad" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                    <option value="Alta">🔴 Alta [Crítica]</option>
+                    <option value="Media" selected>🟡 Media [Estándar]</option>
+                    <option value="Baja">🟢 Baja [Secundaria]</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Fecha Límite [Deadline]</label>
+                  <input type="date" id="fechaLimite" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                </div>
+              </div>
+              <div class="flex justify-end space-x-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" onclick="toggleForm()" class="px-4 py-2 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancelar</button>
+                <button type="submit" id="submitBtn" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-5 py-2.5 rounded transition shadow-md flex items-center space-x-2">
+                  <i data-lucide="check-square" class="w-4 h-4"></i>
+                  <span>REGISTRAR EN BITÁCORA</span>
+                </button>
+              </div>
+            </form>
           </div>
-          <span class="text-xs font-mono text-slate-500 tracking-widest uppercase">Estatus: Inspección de obra</span>
+        </section>
+
+        <!-- Filtros y Lista de Tareas -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3 gap-3">
+            <div class="flex space-x-2 font-mono text-xs">
+              <button onclick="setFilter('all')" id="tabAll" class="px-3 py-1.5 rounded-md font-semibold transition bg-sky-600 text-white border border-sky-400/30">
+                [TODAS]
+              </button>
+              <button onclick="setFilter('Alta')" id="tabHigh" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent">
+                [ALTA_PRIORIDAD]
+              </button>
+              <button onclick="setFilter('Urgent')" id="tabUrgent" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent">
+                [POR_VENCER]
+              </button>
+            </div>
+            <span class="text-xs font-mono text-slate-500 tracking-widest uppercase">Estatus: Requerimientos del Centro</span>
+          </div>
+
+          <!-- Estado de Carga -->
+          <div id="loading" class="text-center py-16 text-slate-500 space-y-3 font-mono">
+            <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-sky-500"></i>
+            <p class="text-xs tracking-widest uppercase">Sincronizando registros con Sheets DB...</p>
+          </div>
+
+          <!-- Lista de Tareas -->
+          <div id="taskList" class="flex flex-col space-y-3 pt-1"></div>
         </div>
 
-        <!-- Estado de Carga -->
-        <div id="loading" class="text-center py-16 text-slate-500 space-y-3 font-mono">
-          <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-sky-600 dark:text-sky-400"></i>
-          <p class="text-xs tracking-widest uppercase">Cargando datos de plano...</p>
-        </div>
-
-        <!-- Lista de Tareas Alargadas (Ancho Completo) / Estilo Ficha de Proyecto -->
-        <div id="taskList" class="flex flex-col space-y-3 pt-1"></div>
       </section>
 
     </main>
   </div>
 
-  <!-- Footer Estilo Cajetín de Plano / Carátula de Proyecto -->
+  <!-- Pie de Página / Cajetín Final de Proyecto -->
   <footer class="bg-white dark:bg-slate-900 border-t border-slate-300 dark:border-slate-800 mt-16 py-6 relative z-10 font-mono text-xs text-slate-500 dark:text-slate-400 transition-colors duration-200">
-    <div class="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-center border border-slate-300 dark:border-slate-800 p-4 rounded-lg bg-slate-50/80 dark:bg-slate-950/60">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-center border border-slate-300 dark:border-slate-800 p-4 rounded-lg bg-slate-50/80 dark:bg-slate-950/60">
       <div class="flex items-center space-x-3">
-        <div class="border border-sky-500/40 p-2 text-sky-600 dark:text-sky-400 bg-sky-500/10">
+        <div class="border border-sky-500/40 p-2 text-sky-600 dark:text-sky-400 bg-sky-500/10 rounded">
           <i data-lucide="box" class="w-5 h-5"></i>
         </div>
         <div>
           <p class="font-bold text-slate-800 dark:text-slate-200">RHV TASKMASTER // CAD SPEC</p>
-          <p class="text-[10px] text-slate-500">SISTEMA DE CONTROL DE PENDIENTES</p>
+          <p class="text-[10px] text-slate-500">SISTEMA INTEGRADO DE CONTROL Y PLANIFICACIÓN</p>
         </div>
       </div>
       
       <div class="text-center md:text-left text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5 border-y md:border-y-0 md:border-x border-slate-300 dark:border-slate-800 py-2 md:py-0 md:px-4">
-        <p><span class="text-slate-400 dark:text-slate-500">PROYECTO:</span> Bitácora RHV</p>
-        <p><span class="text-slate-400 dark:text-slate-500">BACKEND:</span> Google Sheets API v4</p>
+        <p><span class="text-slate-400 dark:text-slate-500">PROYECTO:</span> Horario & Bitácora RHV</p>
+        <p><span class="text-slate-400 dark:text-slate-500">ENGINE:</span> Google Sheets API v4</p>
       </div>
 
       <div class="text-right text-[10px] text-slate-500 space-y-0.5">
-        <p>REVISIÓN: <span class="text-slate-700 dark:text-slate-300">REV-2026.2</span></p>
+        <p>REVISIÓN: <span class="text-slate-700 dark:text-slate-300">REV-2026/2027</span></p>
         <p>&copy; RHV ARCHITECTURE & ENGINEERING</p>
       </div>
     </div>
   </footer>
 
+  <!-- Script Lógico Integrado -->
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbuFnsJl63dcRAWZqO1vGLszyNES4lZSkkd8vPo078-wRvnavbw_UUy5OZZUmdUXWY/exec";
 
@@ -327,6 +690,41 @@
       lucide.createIcons();
     }
 
+    // Cambio de Pestañas (Horario / Bitácora)
+    function switchTab(tab) {
+      const tabHorario = document.getElementById('tabHorario');
+      const tabBitacora = document.getElementById('tabBitacora');
+      const navTabHorario = document.getElementById('navTabHorario');
+      const navTabBitacora = document.getElementById('navTabBitacora');
+
+      if (tab === 'horario') {
+        tabHorario.classList.remove('hidden');
+        tabBitacora.classList.add('hidden');
+        navTabHorario.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md";
+        navTabBitacora.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2";
+      } else {
+        tabHorario.classList.add('hidden');
+        tabBitacora.classList.remove('hidden');
+        navTabBitacora.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md";
+        navTabHorario.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2";
+      }
+      lucide.createIcons();
+    }
+
+    // Conexión Horario -> Bitácora
+    function createTaskFromSchedule(materia, categoria) {
+      switchTab('bitacora');
+      const form = document.getElementById('formContainer');
+      form.classList.remove('hidden');
+      
+      document.getElementById('descripcion').value = `Revisión / Tarea: ${materia}`;
+      if (categoria) {
+        document.getElementById('categoria').value = categoria;
+      }
+      document.getElementById('prioridad').value = 'Alta';
+      document.getElementById('descripcion').focus();
+    }
+
     function toggleForm() {
       const form = document.getElementById('formContainer');
       form.classList.toggle('hidden');
@@ -335,18 +733,18 @@
     async function fetchTasks() {
       const syncIcon = document.getElementById('syncIcon');
       const loading = document.getElementById('loading');
-      syncIcon.classList.add('animate-spin');
-      if (tasks.length === 0) loading.classList.remove('hidden');
+      if (syncIcon) syncIcon.classList.add('animate-spin');
+      if (tasks.length === 0 && loading) loading.classList.remove('hidden');
 
       try {
         const response = await fetch(GOOGLE_SCRIPT_URL);
         tasks = await response.json();
         renderTasks();
       } catch (err) {
-        alert("Error al sincronizar datos de plano: " + err.message);
+        console.error("Error al sincronizar datos:", err);
       } finally {
-        syncIcon.classList.remove('animate-spin');
-        loading.classList.add('hidden');
+        if (syncIcon) syncIcon.classList.remove('animate-spin');
+        if (loading) loading.classList.add('hidden');
       }
     }
 
@@ -374,7 +772,7 @@
           body: JSON.stringify({ action: "create", task: newTask })
         });
         document.getElementById('taskForm').reset();
-        toggleForm();
+        document.getElementById('fechaLimite').value = new Date().toISOString().split('T')[0];
         setTimeout(fetchTasks, 1000);
       } catch (err) {
         alert("Error al guardar registro: " + err.message);
@@ -403,11 +801,7 @@
 
     function setFilter(filter) {
       currentFilter = filter;
-      const tabs = {
-        'all': 'tabAll',
-        'Alta': 'tabHigh',
-        'Urgent': 'tabUrgent'
-      };
+      const tabs = { 'all': 'tabAll', 'Alta': 'tabHigh', 'Urgent': 'tabUrgent' };
 
       Object.values(tabs).forEach(tabId => {
         const btn = document.getElementById(tabId);
@@ -422,7 +816,9 @@
 
     function updateStats() {
       const today = new Date().toISOString().split('T')[0];
-      document.getElementById('statTotal').innerText = tasks.length;
+      const count = tasks.length;
+      document.getElementById('statTotal').innerText = count;
+      document.getElementById('tabBadgeTasks').innerText = count;
       document.getElementById('statHigh').innerText = tasks.filter(t => t.prioridad === 'Alta').length;
       document.getElementById('statDue').innerText = tasks.filter(t => t.fechaLimite <= today).length;
       document.getElementById('statCat').innerText = new Set(tasks.map(t => t.categoria)).size;
@@ -484,7 +880,7 @@
               <span class="px-2.5 py-1 rounded border text-[10px] font-bold bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700">${task.categoria}</span>
               <span class="px-2.5 py-1 rounded border text-[10px] font-bold ${prioBadge[task.prioridad]}">${task.prioridad}</span>
               <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 ml-1">
-                <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500"></i> ${task.fechaLimite}
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> ${task.fechaLimite}
               </span>
             </div>
 
@@ -500,7 +896,7 @@
       lucide.createIcons();
     }
 
-    // Inicializar tema y datos
+    // Inicializar app
     initTheme();
     document.getElementById('fechaLimite').value = new Date().toISOString().split('T')[0];
     fetchTasks();
