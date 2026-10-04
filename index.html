@@ -3,150 +3,254 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskMaster - Gestor de Tareas</title>
+  <title>RHV - Tareas pendientes</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='18' x='3' y='3' rx='2'/><path d='m9 12 2 2 4-4'/></svg>">
+  <!-- Google Fonts para toque escolar / notas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Estilo Papel Cuadriculado */
+    .bg-grid-notebook {
+      background-color: #f8fafc;
+      background-image: 
+        linear-gradient(to right, rgba(203, 213, 225, 0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(203, 213, 225, 0.4) 1px, transparent 1px);
+      background-size: 24px 24px;
+      position: relative;
+    }
+
+    /* Línea de margen de libreta */
+    .notebook-margin::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: clamp(12px, 4vw, 40px);
+      width: 2px;
+      background-color: rgba(239, 68, 68, 0.3);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .font-handwriting {
+      font-family: 'Caveat', cursive;
+    }
+
+    .font-sans {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Efectos de Post-it alargado */
+    .postit-card {
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: rotate(0deg);
+    }
+
+    .postit-card::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50px;
+      width: 60px;
+      height: 20px;
+      background-color: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(203, 213, 225, 0.7);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      backdrop-filter: blur(1px);
+      z-index: 10;
+    }
+
+    .postit-card:hover {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+      z-index: 20;
+    }
+  </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen antialiased flex flex-col">
+<body class="bg-grid-notebook notebook-margin font-sans text-slate-800 min-h-screen flex flex-col justify-between">
 
-  <!-- Header Principal -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <div class="bg-indigo-600 p-2 rounded-xl text-white shadow-md shadow-indigo-600/20">
-          <i data-lucide="check-square" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-base text-slate-900 leading-none">TaskMaster</h1>
-          <span class="text-[11px] text-slate-400">Google Sheets Sync</span>
-        </div>
-      </div>
-      
-      <div class="flex items-center space-x-2">
-        <button onclick="toggleForm()" class="flex items-center space-x-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl transition font-medium shadow-sm shadow-indigo-600/20">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Nueva Tarea</span>
-        </button>
-        <button onclick="fetchTasks()" title="Sincronizar" class="p-2 text-slate-600 hover:bg-slate-100 rounded-xl border border-slate-200 transition">
-          <i data-lucide="refresh-cw" id="syncIcon" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow space-y-6">
-
-    <!-- Resumen / Métricas Rápidas -->
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
-        <div>
-          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Pendientes</p>
-          <p id="statTotal" class="text-xl font-extrabold text-slate-800 mt-0.5">0</p>
-        </div>
-        <div class="bg-slate-100 text-slate-600 p-2.5 rounded-xl"><i data-lucide="list-todo" class="w-4 h-4"></i></div>
-      </div>
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
-        <div>
-          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Alta Prioridad</p>
-          <p id="statHigh" class="text-xl font-extrabold text-red-600 mt-0.5">0</p>
-        </div>
-        <div class="bg-red-50 text-red-600 p-2.5 rounded-xl"><i data-lucide="alert-circle" class="w-4 h-4"></i></div>
-      </div>
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
-        <div>
-          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Por Vencer</p>
-          <p id="statDue" class="text-xl font-extrabold text-amber-600 mt-0.5">0</p>
-        </div>
-        <div class="bg-amber-50 text-amber-600 p-2.5 rounded-xl"><i data-lucide="clock" class="w-4 h-4"></i></div>
-      </div>
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
-        <div>
-          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Categorías</p>
-          <p id="statCat" class="text-xl font-extrabold text-indigo-600 mt-0.5">0</p>
-        </div>
-        <div class="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl"><i data-lucide="folder" class="w-4 h-4"></i></div>
-      </div>
-    </section>
-
-    <!-- Formulario Plegable para Nueva Tarea -->
-    <section id="formContainer" class="hidden transition-all duration-300">
-      <div class="bg-white border border-indigo-100 rounded-2xl p-5 shadow-lg ring-1 ring-indigo-500/10">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-            <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-600"></i> Crear Nueva Tarea
-          </h2>
-          <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+  <!-- Capa principal -->
+  <div class="relative z-10 flex-grow">
+    <!-- Header Principal con estética de bloc -->
+    <header class="bg-white/90 backdrop-blur-md border-b-2 border-slate-200 sticky top-0 z-30 shadow-xs">
+      <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <div class="bg-indigo-600 p-2.5 rounded-2xl text-white shadow-md shadow-indigo-500/20">
+            <i data-lucide="notebook-pen" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-lg md:text-xl text-slate-900 leading-tight tracking-tight">RHV - Tareas pendientes</h1>
+            <div class="flex items-center space-x-2">
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="text-[11px] font-medium text-slate-500">Google Sheets Sync active</span>
+            </div>
+          </div>
         </div>
         
-        <form id="taskForm" class="space-y-4">
+        <div class="flex items-center space-x-2">
+          <button onclick="toggleForm()" class="flex items-center space-x-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-semibold transition shadow-md shadow-indigo-600/20 hover:scale-105">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Nueva Tarea</span>
+          </button>
+          <button onclick="fetchTasks()" title="Sincronizar" class="p-2.5 text-slate-600 hover:bg-slate-100 rounded-xl border border-slate-300/80 bg-white transition shadow-xs">
+            <i data-lucide="refresh-cw" id="syncIcon" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+
+      <!-- Resumen / Métricas Rápidas -->
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-amber-50/80 border border-amber-200/90 rounded-2xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
+          <div class="w-2.5 h-2.5 rounded-full bg-amber-400/80 absolute top-2 right-2 border border-amber-500/30"></div>
           <div>
-            <label class="block text-xs font-medium text-slate-500 mb-1">Descripción</label>
-            <input type="text" id="descripcion" placeholder="Escribe el nombre de la tarea..." required 
-                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-sm transition">
+            <p class="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Pendientes</p>
+            <p id="statTotal" class="text-2xl font-black text-amber-950 mt-1">0</p>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Categoría</label>
-              <select id="categoria" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
-                <option value="Clases">📚 Clases</option>
-                <option value="Tutoría">👤 Tutoría</option>
-                <option value="Gestión">💼 Gestión</option>
-                <option value="Otros">📌 Otros</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Prioridad</label>
-              <select id="prioridad" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
-                <option value="Alta">🔴 Alta</option>
-                <option value="Media" selected>🟡 Media</option>
-                <option value="Baja">🟢 Baja</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Fecha Límite</label>
-              <input type="date" id="fechaLimite" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
-            </div>
+          <div class="bg-amber-200/60 text-amber-800 p-3 rounded-xl"><i data-lucide="list-todo" class="w-5 h-5"></i></div>
+        </div>
+
+        <div class="bg-rose-50/80 border border-rose-200/90 rounded-2xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
+          <div class="w-2.5 h-2.5 rounded-full bg-rose-400/80 absolute top-2 right-2 border border-rose-500/30"></div>
+          <div>
+            <p class="text-[11px] font-bold text-rose-800 uppercase tracking-wider">Alta Prioridad</p>
+            <p id="statHigh" class="text-2xl font-black text-rose-950 mt-1">0</p>
           </div>
-          <div class="flex justify-end space-x-2 pt-2">
-            <button type="button" onclick="toggleForm()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
-            <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-5 py-2 rounded-xl transition shadow-md shadow-indigo-600/20 flex items-center space-x-2">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span>Guardar Tarea</span>
+          <div class="bg-rose-200/60 text-rose-800 p-3 rounded-xl"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
+        </div>
+
+        <div class="bg-orange-50/80 border border-orange-200/90 rounded-2xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
+          <div class="w-2.5 h-2.5 rounded-full bg-orange-400/80 absolute top-2 right-2 border border-orange-500/30"></div>
+          <div>
+            <p class="text-[11px] font-bold text-orange-800 uppercase tracking-wider">Por Vencer</p>
+            <p id="statDue" class="text-2xl font-black text-orange-950 mt-1">0</p>
+          </div>
+          <div class="bg-orange-200/60 text-orange-800 p-3 rounded-xl"><i data-lucide="clock" class="w-5 h-5"></i></div>
+        </div>
+
+        <div class="bg-emerald-50/80 border border-emerald-200/90 rounded-2xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-400/80 absolute top-2 right-2 border border-emerald-500/30"></div>
+          <div>
+            <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Categorías</p>
+            <p id="statCat" class="text-2xl font-black text-emerald-950 mt-1">0</p>
+          </div>
+          <div class="bg-emerald-200/60 text-emerald-800 p-3 rounded-xl"><i data-lucide="folder" class="w-5 h-5"></i></div>
+        </div>
+      </section>
+
+      <!-- Formulario Plegable para Nueva Tarea -->
+      <section id="formContainer" class="hidden transition-all duration-300">
+        <div class="bg-yellow-50 border-2 border-yellow-200/80 rounded-3xl p-6 shadow-xl relative">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold text-yellow-950 flex items-center gap-2">
+              <i data-lucide="sticky-note" class="w-5 h-5 text-indigo-600"></i> Anotar Nueva Tarea
+            </h2>
+            <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+              <i data-lucide="x" class="w-5 h-5"></i>
             </button>
           </div>
-        </form>
+          
+          <form id="taskForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-yellow-900/70 mb-1">Descripción</label>
+              <input type="text" id="descripcion" placeholder="¿Qué necesitas completar hoy?..." required 
+                     class="w-full bg-white/80 border border-yellow-300/80 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-sm transition">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-yellow-900/70 mb-1">Categoría</label>
+                <select id="categoria" class="w-full bg-white/80 border border-yellow-300/80 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+                  <option value="Clases">📚 Clases</option>
+                  <option value="Tutoría">👤 Tutoría</option>
+                  <option value="Gestión">💼 Gestión</option>
+                  <option value="Otros">📌 Otros</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-yellow-900/70 mb-1">Prioridad</label>
+                <select id="prioridad" class="w-full bg-white/80 border border-yellow-300/80 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+                  <option value="Alta">🔴 Alta</option>
+                  <option value="Media" selected>🟡 Media</option>
+                  <option value="Baja">🟢 Baja</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-yellow-900/70 mb-1">Fecha Límite</label>
+                <input type="date" id="fechaLimite" required class="w-full bg-white/80 border border-yellow-300/80 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+              </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+              <button type="button" onclick="toggleForm()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-yellow-200/50 transition">Cancelar</button>
+              <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition shadow-md shadow-indigo-600/20 flex items-center space-x-2">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Pegar Tarea</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Navegación por Pestañas / Filtros -->
+      <section class="space-y-6">
+        <div class="flex items-center justify-between border-b-2 border-slate-200/80 pb-2">
+          <div class="flex space-x-2 sm:space-x-4">
+            <button onclick="setFilter('all')" id="tabAll" class="px-3 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-sm">
+              Todas
+            </button>
+            <button onclick="setFilter('Alta')" id="tabHigh" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition">
+              Alta Prioridad
+            </button>
+            <button onclick="setFilter('Urgent')" id="tabUrgent" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition">
+              Por Vencer
+            </button>
+          </div>
+          <span class="text-xs font-handwriting text-2xl text-slate-500 hidden sm:inline-block">Tablón de notas</span>
+        </div>
+
+        <!-- Estado de Carga -->
+        <div id="loading" class="text-center py-16 text-slate-400 space-y-3">
+          <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-indigo-600"></i>
+          <p class="text-xs font-semibold tracking-wide">Sincronizando tus notas...</p>
+        </div>
+
+        <!-- Lista de Tareas Alargadas (Ancho Completo) -->
+        <div id="taskList" class="flex flex-col space-y-4 pt-2"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer Profesional -->
+  <footer class="bg-white border-t border-slate-200/80 mt-16 py-8 relative z-10">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center space-x-2">
+        <div class="bg-indigo-600 p-1.5 rounded-lg text-white">
+          <i data-lucide="check-square" class="w-4 h-4"></i>
+        </div>
+        <span class="font-bold text-slate-700">RHV TaskMaster</span>
+        <span>— Organiza tus pendientes fácilmente</span>
       </div>
-    </section>
-
-    <!-- Navegación por Pestañas / Filtros -->
-    <section class="space-y-4">
-      <div class="flex border-b border-slate-200 text-xs font-medium text-slate-500 space-x-6">
-        <button onclick="setFilter('all')" id="tabAll" class="pb-2.5 border-b-2 border-indigo-600 text-indigo-600 font-semibold flex items-center space-x-2 transition">
-          <span>Todas</span>
-        </button>
-        <button onclick="setFilter('Alta')" id="tabHigh" class="pb-2.5 border-b-2 border-transparent hover:text-slate-800 flex items-center space-x-2 transition">
-          <span>Alta Prioridad</span>
-        </button>
-        <button onclick="setFilter('Urgent')" id="tabUrgent" class="pb-2.5 border-b-2 border-transparent hover:text-slate-800 flex items-center space-x-2 transition">
-          <span>Por Vencer</span>
-        </button>
+      
+      <div class="flex items-center space-x-6 text-slate-400">
+        <span class="flex items-center gap-1"><i data-lucide="database" class="w-3.5 h-3.5"></i> Google Sheets Backend</span>
+        <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Sincronización Segura</span>
       </div>
 
-      <!-- Estado de Carga -->
-      <div id="loading" class="text-center py-12 text-slate-400 space-y-2">
-        <i data-lucide="loader-2" class="w-7 h-7 animate-spin mx-auto text-indigo-600"></i>
-        <p class="text-xs font-medium">Sincronizando tareas...</p>
+      <div class="text-slate-400 text-center md:text-right">
+        <p>&copy; RHV. Todos los derechos reservados.</p>
       </div>
-
-      <!-- Lista de Tareas -->
-      <div id="taskList" class="space-y-2"></div>
-    </section>
-
-  </main>
+    </div>
+  </footer>
 
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbuFnsJl63dcRAWZqO1vGLszyNES4lZSkkd8vPo078-wRvnavbw_UUy5OZZUmdUXWY/exec";
@@ -181,7 +285,7 @@
       e.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Guardando...</span>';
+      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Pegando...</span>';
       lucide.createIcons();
 
       const newTask = {
@@ -207,7 +311,7 @@
         alert("Error al guardar: " + err.message);
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i><span>Guardar Tarea</span>';
+        submitBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i><span>Pegar Tarea</span>';
         lucide.createIcons();
       }
     });
@@ -238,11 +342,11 @@
 
       Object.values(tabs).forEach(tabId => {
         const btn = document.getElementById(tabId);
-        btn.className = "pb-2.5 border-b-2 border-transparent hover:text-slate-800 flex items-center space-x-2 transition";
+        btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition";
       });
 
       const activeBtn = document.getElementById(tabs[filter]);
-      activeBtn.className = "pb-2.5 border-b-2 border-indigo-600 text-indigo-600 font-semibold flex items-center space-x-2 transition";
+      activeBtn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-sm";
 
       renderTasks();
     }
@@ -267,41 +371,61 @@
       if (currentFilter === 'Urgent') filtered = tasks.filter(t => t.fechaLimite <= today);
 
       if (!Array.isArray(filtered) || filtered.length === 0) {
+        list.className = "block";
         list.innerHTML = `
-          <div class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
-            <i data-lucide="check-circle-2" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
-            <p class="text-xs text-slate-400 font-medium">No hay tareas pendientes en esta sección.</p>
+          <div class="text-center py-16 bg-white/60 rounded-3xl border-2 border-dashed border-slate-300/80">
+            <i data-lucide="file-check-2" class="w-10 h-10 text-slate-400 mx-auto mb-2"></i>
+            <p class="text-sm font-semibold text-slate-500">No hay tareas anotadas en esta categoría.</p>
           </div>`;
         lucide.createIcons();
         return;
       }
 
+      list.className = "flex flex-col space-y-4 pt-2";
+
       const prioColor = {
-        'Alta': 'bg-red-50 text-red-700 border-red-200/60',
-        'Media': 'bg-amber-50 text-amber-700 border-amber-200/60',
-        'Baja': 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
+        'Alta': 'bg-rose-100 text-rose-800 border-rose-300',
+        'Media': 'bg-amber-100 text-amber-800 border-amber-300',
+        'Baja': 'bg-emerald-100 text-emerald-800 border-emerald-300'
       };
 
-      filtered.forEach(task => {
+      // Estilos Post-it por categoría
+      const categoryStyle = {
+        'Clases': 'bg-blue-50/90 border-blue-200 text-blue-900',
+        'Tutoría': 'bg-purple-50/90 border-purple-200 text-purple-900',
+        'Gestión': 'bg-amber-50/90 border-amber-200 text-amber-900',
+        'Otros': 'bg-slate-50/90 border-slate-200 text-slate-900'
+      };
+
+      filtered.forEach((task) => {
         const isOverdue = task.fechaLimite < today;
+        const postitBg = categoryStyle[task.categoria] || categoryStyle['Otros'];
+        
         const item = document.createElement('div');
-        item.className = 'bg-white border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between hover:shadow-md hover:border-slate-300 transition duration-150 group';
+        item.className = `postit-card ${postitBg} border-2 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md transition duration-200 w-full`;
+        
         item.innerHTML = `
-          <div class="space-y-1 pr-3">
-            <div class="flex items-center space-x-2">
-              <span class="font-medium text-slate-800 text-sm leading-snug">${task.descripcion}</span>
-              ${isOverdue ? '<span class="text-[10px] bg-red-100 text-red-700 font-medium px-1.5 py-0.5 rounded">Vencida</span>' : ''}
-            </div>
-            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-              <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[11px] font-medium">${task.categoria}</span>
-              <span class="px-2 py-0.5 rounded-md border text-[11px] font-medium ${prioColor[task.prioridad]}">${task.prioridad}</span>
-              <span class="flex items-center gap-1 text-[11px] text-slate-400"><i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i> ${task.fechaLimite}</span>
+          <div class="flex-grow space-y-1 pl-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-bold text-slate-800 text-sm md:text-base leading-snug">${task.descripcion}</span>
+              ${isOverdue ? '<span class="text-[10px] bg-rose-600 text-white font-extrabold px-2 py-0.5 rounded-md shadow-xs animate-pulse">¡VENCIDA!</span>' : ''}
             </div>
           </div>
-          <button onclick="completeTask('${task.id}')" title="Marcar como completada" 
-                  class="bg-slate-50 hover:bg-emerald-600 hover:text-white text-slate-400 hover:border-emerald-600 border border-slate-200 p-2 rounded-xl transition flex-shrink-0">
-            <i data-lucide="check" class="w-4 h-4"></i>
-          </button>
+
+          <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-900/5 flex-shrink-0">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="px-2.5 py-1 rounded-lg border text-[11px] font-bold bg-white/70 shadow-xs">${task.categoria}</span>
+              <span class="px-2.5 py-1 rounded-lg border text-[11px] font-bold ${prioColor[task.prioridad]}">${task.prioridad}</span>
+              <span class="flex items-center gap-1 text-[11px] font-medium text-slate-500 ml-1">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> ${task.fechaLimite}
+              </span>
+            </div>
+
+            <button onclick="completeTask('${task.id}')" title="Marcar como completada" 
+                    class="bg-white/80 hover:bg-emerald-600 hover:text-white text-slate-600 border border-slate-300 p-2 rounded-xl transition shadow-xs hover:scale-105">
+              <i data-lucide="check" class="w-4.5 h-4.5"></i>
+            </button>
+          </div>
         `;
         list.appendChild(item);
       });
