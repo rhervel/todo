@@ -1,106 +1,151 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RHV - Tareas pendientes</title>
+  <title>RHV - Bitácora de Tareas & Proyectos</title>
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='18' x='3' y='3' rx='2'/><path d='m9 12 2 2 4-4'/></svg>">
-  <!-- Google Fonts para toque escolar / notas -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'><path d='M2 12h20M12 2v20M7 7l10 10M17 7L7 17'/></svg>">
+  <!-- Fonts: JetBrains Mono (técnica) + Plus Jakarta Sans (interfaz) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Estilo Papel Cuadriculado */
-    .bg-grid-notebook {
-      background-color: #f8fafc;
-      background-image: 
-        linear-gradient(to right, rgba(203, 213, 225, 0.4) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(203, 213, 225, 0.4) 1px, transparent 1px);
-      background-size: 24px 24px;
-      position: relative;
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
     }
-
-    /* Línea de margen de libreta */
-    .notebook-margin::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: clamp(12px, 4vw, 40px);
-      width: 2px;
-      background-color: rgba(239, 68, 68, 0.3);
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .font-handwriting {
-      font-family: 'Caveat', cursive;
-    }
-
     .font-sans {
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Efectos de Post-it alargado */
-    .postit-card {
-      position: relative;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      transform: rotate(0deg);
+    /* Fondo Modo Oscuro: Blueprint Night */
+    .dark .bg-grid-blueprint {
+      background-color: #0f172a;
+      background-image: 
+        linear-gradient(to right, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 5px, transparent 5px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 5px, transparent 5px);
+      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
     }
 
-    .postit-card::before {
+    /* Fondo Modo Claro: Papel Milimetrado Técnico (Draft Paper) */
+    .bg-grid-blueprint {
+      background-color: #f8fafc;
+      background-image: 
+        linear-gradient(to right, rgba(148, 163, 184, 0.2) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.2) 1px, transparent 1px),
+        linear-gradient(to right, rgba(100, 116, 139, 0.1) 5px, transparent 5px),
+        linear-gradient(to bottom, rgba(100, 116, 139, 0.1) 5px, transparent 5px);
+      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    }
+
+    /* Regla / Cota lateral */
+    .blueprint-margin::before {
       content: '';
       position: absolute;
-      top: -10px;
-      left: 50px;
-      width: 60px;
-      height: 20px;
-      background-color: rgba(255, 255, 255, 0.65);
-      border: 1px solid rgba(203, 213, 225, 0.7);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      backdrop-filter: blur(1px);
-      z-index: 10;
+      top: 0;
+      bottom: 0;
+      left: clamp(8px, 2vw, 24px);
+      width: 1px;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .dark .blueprint-margin::before {
+      background-color: rgba(56, 189, 248, 0.25);
+    }
+    .blueprint-margin::before {
+      background-color: rgba(30, 41, 59, 0.2);
     }
 
-    .postit-card:hover {
-      transform: translateY(-3px) !important;
-      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-      z-index: 20;
+    /* Tarjetas de Tarea estilo Ficha de Proyecto */
+    .blueprint-card {
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
+    .dark .blueprint-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+    }
+    .blueprint-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+    }
+
+    .dark .blueprint-card:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.6), 0 0 15px rgba(56, 189, 248, 0.15);
+    }
+    .blueprint-card:hover {
+      border-color: #0284c7;
+      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Cota visual lateral en hover */
+    .blueprint-card::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      transition: background 0.2s;
+    }
+    .dark .blueprint-card::after { background: #334155; }
+    .blueprint-card::after { background: #cbd5e1; }
+    
+    .dark .blueprint-card:hover::after { background: #38bdf8; }
+    .blueprint-card:hover::after { background: #0284c7; }
   </style>
 </head>
-<body class="bg-grid-notebook notebook-margin font-sans text-slate-800 min-h-screen flex flex-col justify-between">
+<body class="bg-grid-blueprint blueprint-margin font-sans text-slate-800 dark:text-slate-200 min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white transition-colors duration-200">
 
   <!-- Capa principal -->
   <div class="relative z-10 flex-grow">
-    <!-- Header Principal con estética de bloc -->
-    <header class="bg-white/90 backdrop-blur-md border-b-2 border-slate-200 sticky top-0 z-30 shadow-xs">
+    <!-- Header Principal con estética de Cajetín Técnico superior -->
+    <header class="bg-white/90 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-300 dark:border-slate-800 sticky top-0 z-30 shadow-sm dark:shadow-xl transition-colors duration-200">
       <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <div class="bg-indigo-600 p-2.5 rounded-2xl text-white shadow-md shadow-indigo-500/20">
-            <i data-lucide="notebook-pen" class="w-6 h-6"></i>
+          <div class="bg-sky-500/10 border border-sky-500/30 p-2.5 rounded-lg text-sky-600 dark:text-sky-400">
+            <i data-lucide="compass" class="w-6 h-6"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg md:text-xl text-slate-900 leading-tight tracking-tight">RHV - Tareas pendientes</h1>
             <div class="flex items-center space-x-2">
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-[11px] font-medium text-slate-500">Google Sheets Sync active</span>
+              <h1 class="font-bold text-base md:text-lg text-slate-900 dark:text-slate-100 tracking-tight font-mono">RHV // BITÁCORA TÉCNICA</h1>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-200 dark:bg-slate-800 text-sky-700 dark:text-sky-400 border border-slate-300 dark:border-slate-700 rounded">v2.5</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 dark:animate-pulse"></span>
+              <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400">SHEETS_DB_SYNC: OK</span>
             </div>
           </div>
         </div>
         
-        <div class="flex items-center space-x-2">
-          <button onclick="toggleForm()" class="flex items-center space-x-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-semibold transition shadow-md shadow-indigo-600/20 hover:scale-105">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Nueva Tarea</span>
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <!-- Botón de Modo Claro / Oscuro -->
+          <button onclick="toggleTheme()" title="Cambiar tema" class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-300 dark:border-slate-700 transition">
+            <i data-lucide="moon" id="themeIconDark" class="w-4 h-4 hidden dark:block"></i>
+            <i data-lucide="sun" id="themeIconLight" class="w-4 h-4 block dark:hidden text-amber-600"></i>
           </button>
-          <button onclick="fetchTasks()" title="Sincronizar" class="p-2.5 text-slate-600 hover:bg-slate-100 rounded-xl border border-slate-300/80 bg-white transition shadow-xs">
+
+          <button onclick="toggleForm()" class="flex items-center space-x-2 text-xs bg-sky-600 hover:bg-sky-500 text-white px-3.5 sm:px-4 py-2.5 rounded-md font-mono font-medium transition border border-sky-400/30 shadow-md">
+            <i data-lucide="plus-square" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">NUEVO REGISTRO</span>
+          </button>
+
+          <button onclick="fetchTasks()" title="Sincronizar" class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-300 dark:border-slate-700 transition">
             <i data-lucide="refresh-cw" id="syncIcon" class="w-4 h-4"></i>
           </button>
         </div>
@@ -109,145 +154,148 @@
 
     <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
 
-      <!-- Resumen / Métricas Rápidas -->
-      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-amber-50/80 border border-amber-200/90 rounded-2xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
-          <div class="w-2.5 h-2.5 rounded-full bg-amber-400/80 absolute top-2 right-2 border border-amber-500/30"></div>
-          <div>
-            <p class="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Pendientes</p>
-            <p id="statTotal" class="text-2xl font-black text-amber-950 mt-1">0</p>
+      <!-- Resumen / Métricas Rápidas en Bloques de Cota -->
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg relative overflow-hidden shadow-xs transition-colors duration-200">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider mb-1">
+            <span>[TOTAL_PEND]</span>
+            <i data-lucide="layers" class="w-4 h-4 text-slate-400 dark:text-slate-500"></i>
           </div>
-          <div class="bg-amber-200/60 text-amber-800 p-3 rounded-xl"><i data-lucide="list-todo" class="w-5 h-5"></i></div>
+          <p id="statTotal" class="text-2xl font-bold text-slate-900 dark:text-slate-100">0</p>
+          <div class="text-[10px] text-slate-500 mt-1">Registros activos</div>
         </div>
 
-        <div class="bg-rose-50/80 border border-rose-200/90 rounded-2xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
-          <div class="w-2.5 h-2.5 rounded-full bg-rose-400/80 absolute top-2 right-2 border border-rose-500/30"></div>
-          <div>
-            <p class="text-[11px] font-bold text-rose-800 uppercase tracking-wider">Alta Prioridad</p>
-            <p id="statHigh" class="text-2xl font-black text-rose-950 mt-1">0</p>
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-300 dark:border-rose-900/40 p-3.5 rounded-lg relative overflow-hidden shadow-xs transition-colors duration-200">
+          <div class="flex items-center justify-between text-rose-700 dark:text-rose-400 text-[10px] uppercase tracking-wider mb-1">
+            <span>[PRIORIDAD_CRÍT]</span>
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600 dark:text-rose-400"></i>
           </div>
-          <div class="bg-rose-200/60 text-rose-800 p-3 rounded-xl"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
+          <p id="statHigh" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</p>
+          <div class="text-[10px] text-rose-600/80 dark:text-rose-500/80 mt-1">Acción inmediata</div>
         </div>
 
-        <div class="bg-orange-50/80 border border-orange-200/90 rounded-2xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
-          <div class="w-2.5 h-2.5 rounded-full bg-orange-400/80 absolute top-2 right-2 border border-orange-500/30"></div>
-          <div>
-            <p class="text-[11px] font-bold text-orange-800 uppercase tracking-wider">Por Vencer</p>
-            <p id="statDue" class="text-2xl font-black text-orange-950 mt-1">0</p>
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-amber-300 dark:border-amber-900/40 p-3.5 rounded-lg relative overflow-hidden shadow-xs transition-colors duration-200">
+          <div class="flex items-center justify-between text-amber-700 dark:text-amber-400 text-[10px] uppercase tracking-wider mb-1">
+            <span>[POR_VENCER]</span>
+            <i data-lucide="clock" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
           </div>
-          <div class="bg-orange-200/60 text-orange-800 p-3 rounded-xl"><i data-lucide="clock" class="w-5 h-5"></i></div>
+          <p id="statDue" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</p>
+          <div class="text-[10px] text-amber-700/80 dark:text-amber-500/80 mt-1">Fecha límite alcanzada</div>
         </div>
 
-        <div class="bg-emerald-50/80 border border-emerald-200/90 rounded-2xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-400/80 absolute top-2 right-2 border border-emerald-500/30"></div>
-          <div>
-            <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Categorías</p>
-            <p id="statCat" class="text-2xl font-black text-emerald-950 mt-1">0</p>
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-sky-300 dark:border-sky-900/40 p-3.5 rounded-lg relative overflow-hidden shadow-xs transition-colors duration-200">
+          <div class="flex items-center justify-between text-sky-700 dark:text-sky-400 text-[10px] uppercase tracking-wider mb-1">
+            <span>[MÓDULOS]</span>
+            <i data-lucide="grid" class="w-4 h-4 text-sky-600 dark:text-sky-400"></i>
           </div>
-          <div class="bg-emerald-200/60 text-emerald-800 p-3 rounded-xl"><i data-lucide="folder" class="w-5 h-5"></i></div>
+          <p id="statCat" class="text-2xl font-bold text-sky-600 dark:text-sky-400">0</p>
+          <div class="text-[10px] text-sky-700/80 dark:text-sky-500/80 mt-1">Categorías de proyecto</div>
         </div>
       </section>
 
       <!-- Formulario Plegable para Nueva Tarea -->
       <section id="formContainer" class="hidden transition-all duration-300">
-        <div class="bg-yellow-50 border-2 border-yellow-200/80 rounded-3xl p-6 shadow-xl relative">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-bold text-yellow-950 flex items-center gap-2">
-              <i data-lucide="sticky-note" class="w-5 h-5 text-indigo-600"></i> Anotar Nueva Tarea
+        <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-6 shadow-xl dark:shadow-2xl relative transition-colors duration-200">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <h2 class="text-sm font-mono font-bold text-sky-700 dark:text-sky-400 flex items-center gap-2 uppercase tracking-wide">
+              <i data-lucide="pen-tool" class="w-4 h-4 text-sky-600 dark:text-sky-400"></i> // Entrada de Especificación Técnica
             </h2>
-            <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+            <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded">
               <i data-lucide="x" class="w-5 h-5"></i>
             </button>
           </div>
           
-          <form id="taskForm" class="space-y-4">
+          <form id="taskForm" class="space-y-4 font-mono text-xs">
             <div>
-              <label class="block text-xs font-semibold text-yellow-900/70 mb-1">Descripción</label>
-              <input type="text" id="descripcion" placeholder="¿Qué necesitas completar hoy?..." required 
-                     class="w-full bg-white/80 border border-yellow-300/80 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-sm transition">
+              <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Descripción del Requerimiento / Tarea</label>
+              <input type="text" id="descripcion" placeholder="Ej: Revisión de cálculo estructural / Entrega de memoria..." required 
+                     class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-sky-500 text-sm transition">
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label class="block text-xs font-semibold text-yellow-900/70 mb-1">Categoría</label>
-                <select id="categoria" class="w-full bg-white/80 border border-yellow-300/80 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
-                  <option value="Clases">📚 Clases</option>
-                  <option value="Tutoría">👤 Tutoría</option>
-                  <option value="Gestión">💼 Gestión</option>
-                  <option value="Otros">📌 Otros</option>
+                <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Categoría / Módulo</label>
+                <select id="categoria" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                  <option value="Clases">📐 Clases / Docencia</option>
+                  <option value="Tutoría">👤 Tutoría / Revisión</option>
+                  <option value="Gestión">💼 Gestión / Proyecto</option>
+                  <option value="Otros">📌 Inspección / Otros</option>
                 </select>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-yellow-900/70 mb-1">Prioridad</label>
-                <select id="prioridad" class="w-full bg-white/80 border border-yellow-300/80 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
-                  <option value="Alta">🔴 Alta</option>
-                  <option value="Media" selected>🟡 Media</option>
-                  <option value="Baja">🟢 Baja</option>
+                <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Nivel de Prioridad</label>
+                <select id="prioridad" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                  <option value="Alta">🔴 Alta [Crítica]</option>
+                  <option value="Media" selected>🟡 Media [Estándar]</option>
+                  <option value="Baja">🟢 Baja [Secundaria]</option>
                 </select>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-yellow-900/70 mb-1">Fecha Límite</label>
-                <input type="date" id="fechaLimite" required class="w-full bg-white/80 border border-yellow-300/80 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+                <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Fecha Límite [Deadline]</label>
+                <input type="date" id="fechaLimite" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
               </div>
             </div>
-            <div class="flex justify-end space-x-2 pt-2">
-              <button type="button" onclick="toggleForm()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-yellow-200/50 transition">Cancelar</button>
-              <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition shadow-md shadow-indigo-600/20 flex items-center space-x-2">
-                <i data-lucide="plus" class="w-4 h-4"></i>
-                <span>Pegar Tarea</span>
+            <div class="flex justify-end space-x-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+              <button type="button" onclick="toggleForm()" class="px-4 py-2 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancelar</button>
+              <button type="submit" id="submitBtn" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-5 py-2.5 rounded transition shadow-md flex items-center space-x-2">
+                <i data-lucide="check-square" class="w-4 h-4"></i>
+                <span>REGISTRAR EN BITÁCORA</span>
               </button>
             </div>
           </form>
         </div>
       </section>
 
-      <!-- Navegación por Pestañas / Filtros -->
-      <section class="space-y-6">
-        <div class="flex items-center justify-between border-b-2 border-slate-200/80 pb-2">
-          <div class="flex space-x-2 sm:space-x-4">
-            <button onclick="setFilter('all')" id="tabAll" class="px-3 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-sm">
-              Todas
+      <!-- Navegación por Filtros Técnicos -->
+      <section class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3 gap-3">
+          <div class="flex space-x-2 font-mono text-xs">
+            <button onclick="setFilter('all')" id="tabAll" class="px-3 py-1.5 rounded-md font-semibold transition bg-sky-600 text-white border border-sky-400/30">
+              [TODAS]
             </button>
-            <button onclick="setFilter('Alta')" id="tabHigh" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition">
-              Alta Prioridad
+            <button onclick="setFilter('Alta')" id="tabHigh" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent">
+              [ALTA_PRIORIDAD]
             </button>
-            <button onclick="setFilter('Urgent')" id="tabUrgent" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition">
-              Por Vencer
+            <button onclick="setFilter('Urgent')" id="tabUrgent" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent">
+              [POR_VENCER]
             </button>
           </div>
-          <span class="text-xs font-handwriting text-2xl text-slate-500 hidden sm:inline-block">Tablón de notas</span>
+          <span class="text-xs font-mono text-slate-500 tracking-widest uppercase">Estatus: Inspección de obra</span>
         </div>
 
         <!-- Estado de Carga -->
-        <div id="loading" class="text-center py-16 text-slate-400 space-y-3">
-          <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-indigo-600"></i>
-          <p class="text-xs font-semibold tracking-wide">Sincronizando tus notas...</p>
+        <div id="loading" class="text-center py-16 text-slate-500 space-y-3 font-mono">
+          <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-sky-600 dark:text-sky-400"></i>
+          <p class="text-xs tracking-widest uppercase">Cargando datos de plano...</p>
         </div>
 
-        <!-- Lista de Tareas Alargadas (Ancho Completo) -->
-        <div id="taskList" class="flex flex-col space-y-4 pt-2"></div>
+        <!-- Lista de Tareas Alargadas (Ancho Completo) / Estilo Ficha de Proyecto -->
+        <div id="taskList" class="flex flex-col space-y-3 pt-1"></div>
       </section>
 
     </main>
   </div>
 
-  <!-- Footer Profesional -->
-  <footer class="bg-white border-t border-slate-200/80 mt-16 py-8 relative z-10">
-    <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-      <div class="flex items-center space-x-2">
-        <div class="bg-indigo-600 p-1.5 rounded-lg text-white">
-          <i data-lucide="check-square" class="w-4 h-4"></i>
+  <!-- Footer Estilo Cajetín de Plano / Carátula de Proyecto -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-300 dark:border-slate-800 mt-16 py-6 relative z-10 font-mono text-xs text-slate-500 dark:text-slate-400 transition-colors duration-200">
+    <div class="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-center border border-slate-300 dark:border-slate-800 p-4 rounded-lg bg-slate-50/80 dark:bg-slate-950/60">
+      <div class="flex items-center space-x-3">
+        <div class="border border-sky-500/40 p-2 text-sky-600 dark:text-sky-400 bg-sky-500/10">
+          <i data-lucide="box" class="w-5 h-5"></i>
         </div>
-        <span class="font-bold text-slate-700">RHV TaskMaster</span>
-        <span>— Organiza tus pendientes fácilmente</span>
+        <div>
+          <p class="font-bold text-slate-800 dark:text-slate-200">RHV TASKMASTER // CAD SPEC</p>
+          <p class="text-[10px] text-slate-500">SISTEMA DE CONTROL DE PENDIENTES</p>
+        </div>
       </div>
       
-      <div class="flex items-center space-x-6 text-slate-400">
-        <span class="flex items-center gap-1"><i data-lucide="database" class="w-3.5 h-3.5"></i> Google Sheets Backend</span>
-        <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Sincronización Segura</span>
+      <div class="text-center md:text-left text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5 border-y md:border-y-0 md:border-x border-slate-300 dark:border-slate-800 py-2 md:py-0 md:px-4">
+        <p><span class="text-slate-400 dark:text-slate-500">PROYECTO:</span> Bitácora RHV</p>
+        <p><span class="text-slate-400 dark:text-slate-500">BACKEND:</span> Google Sheets API v4</p>
       </div>
 
-      <div class="text-slate-400 text-center md:text-right">
-        <p>&copy; RHV. Todos los derechos reservados.</p>
+      <div class="text-right text-[10px] text-slate-500 space-y-0.5">
+        <p>REVISIÓN: <span class="text-slate-700 dark:text-slate-300">REV-2026.2</span></p>
+        <p>&copy; RHV ARCHITECTURE & ENGINEERING</p>
       </div>
     </div>
   </footer>
@@ -257,6 +305,27 @@
 
     let tasks = [];
     let currentFilter = 'all';
+
+    // Manejo de Tema (Dark / Light)
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    }
+
+    function toggleTheme() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      lucide.createIcons();
+    }
 
     function toggleForm() {
       const form = document.getElementById('formContainer');
@@ -274,7 +343,7 @@
         tasks = await response.json();
         renderTasks();
       } catch (err) {
-        alert("Error al sincronizar datos: " + err.message);
+        alert("Error al sincronizar datos de plano: " + err.message);
       } finally {
         syncIcon.classList.remove('animate-spin');
         loading.classList.add('hidden');
@@ -285,7 +354,7 @@
       e.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Pegando...</span>';
+      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>REGISTRANDO...</span>';
       lucide.createIcons();
 
       const newTask = {
@@ -308,10 +377,10 @@
         toggleForm();
         setTimeout(fetchTasks, 1000);
       } catch (err) {
-        alert("Error al guardar: " + err.message);
+        alert("Error al guardar registro: " + err.message);
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i><span>Pegar Tarea</span>';
+        submitBtn.innerHTML = '<i data-lucide="check-square" class="w-4 h-4"></i><span>REGISTRAR EN BITÁCORA</span>';
         lucide.createIcons();
       }
     });
@@ -328,7 +397,7 @@
         renderTasks();
         setTimeout(fetchTasks, 1200);
       } catch (err) {
-        alert("Error al completar: " + err.message);
+        alert("Error al liquidar tarea: " + err.message);
       }
     }
 
@@ -342,11 +411,11 @@
 
       Object.values(tabs).forEach(tabId => {
         const btn = document.getElementById(tabId);
-        btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition";
+        btn.className = "px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent";
       });
 
       const activeBtn = document.getElementById(tabs[filter]);
-      activeBtn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-sm";
+      activeBtn.className = "px-3 py-1.5 rounded-md font-semibold transition bg-sky-600 text-white border border-sky-400/30";
 
       renderTasks();
     }
@@ -373,57 +442,55 @@
       if (!Array.isArray(filtered) || filtered.length === 0) {
         list.className = "block";
         list.innerHTML = `
-          <div class="text-center py-16 bg-white/60 rounded-3xl border-2 border-dashed border-slate-300/80">
-            <i data-lucide="file-check-2" class="w-10 h-10 text-slate-400 mx-auto mb-2"></i>
-            <p class="text-sm font-semibold text-slate-500">No hay tareas anotadas en esta categoría.</p>
+          <div class="text-center py-16 bg-white/70 dark:bg-slate-900/50 rounded-lg border border-dashed border-slate-300 dark:border-slate-800 font-mono">
+            <i data-lucide="check-circle-2" class="w-10 h-10 text-slate-400 dark:text-slate-600 mx-auto mb-2"></i>
+            <p class="text-sm font-semibold text-slate-600 dark:text-slate-400">[SIN REGISTROS EN ESTE MÓDULO]</p>
+            <p class="text-xs text-slate-400 dark:text-slate-600 mt-1">Todos los requerimientos están liquidados o aprobados.</p>
           </div>`;
         lucide.createIcons();
         return;
       }
 
-      list.className = "flex flex-col space-y-4 pt-2";
+      list.className = "flex flex-col space-y-3 pt-1";
 
-      const prioColor = {
-        'Alta': 'bg-rose-100 text-rose-800 border-rose-300',
-        'Media': 'bg-amber-100 text-amber-800 border-amber-300',
-        'Baja': 'bg-emerald-100 text-emerald-800 border-emerald-300'
+      const prioBadge = {
+        'Alta': 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800/60',
+        'Media': 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800/60',
+        'Baja': 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/60'
       };
 
-      // Estilos Post-it por categoría
-      const categoryStyle = {
-        'Clases': 'bg-blue-50/90 border-blue-200 text-blue-900',
-        'Tutoría': 'bg-purple-50/90 border-purple-200 text-purple-900',
-        'Gestión': 'bg-amber-50/90 border-amber-200 text-amber-900',
-        'Otros': 'bg-slate-50/90 border-slate-200 text-slate-900'
-      };
-
-      filtered.forEach((task) => {
+      filtered.forEach((task, idx) => {
         const isOverdue = task.fechaLimite < today;
-        const postitBg = categoryStyle[task.categoria] || categoryStyle['Otros'];
+        const codeNum = String(idx + 1).padStart(2, '0');
         
         const item = document.createElement('div');
-        item.className = `postit-card ${postitBg} border-2 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md transition duration-200 w-full`;
+        item.className = `blueprint-card rounded-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full shadow-xs`;
         
         item.innerHTML = `
-          <div class="flex-grow space-y-1 pl-2">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-bold text-slate-800 text-sm md:text-base leading-snug">${task.descripcion}</span>
-              ${isOverdue ? '<span class="text-[10px] bg-rose-600 text-white font-extrabold px-2 py-0.5 rounded-md shadow-xs animate-pulse">¡VENCIDA!</span>' : ''}
+          <div class="flex items-start gap-3 flex-grow pl-2">
+            <span class="font-mono text-xs font-bold text-sky-700 dark:text-sky-400 bg-sky-100 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-800 px-2 py-1 rounded flex-shrink-0">
+              #REC-${codeNum}
+            </span>
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-medium text-slate-800 dark:text-slate-100 text-sm md:text-base leading-snug">${task.descripcion}</span>
+                ${isOverdue ? '<span class="font-mono text-[10px] bg-rose-600 text-white font-extrabold px-2 py-0.5 rounded tracking-wider uppercase">¡FECHA CRÍTICA!</span>' : ''}
+              </div>
             </div>
           </div>
 
-          <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-900/5 flex-shrink-0">
+          <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200 dark:border-slate-800 flex-shrink-0 font-mono">
             <div class="flex items-center gap-2 text-xs">
-              <span class="px-2.5 py-1 rounded-lg border text-[11px] font-bold bg-white/70 shadow-xs">${task.categoria}</span>
-              <span class="px-2.5 py-1 rounded-lg border text-[11px] font-bold ${prioColor[task.prioridad]}">${task.prioridad}</span>
-              <span class="flex items-center gap-1 text-[11px] font-medium text-slate-500 ml-1">
-                <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> ${task.fechaLimite}
+              <span class="px-2.5 py-1 rounded border text-[10px] font-bold bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700">${task.categoria}</span>
+              <span class="px-2.5 py-1 rounded border text-[10px] font-bold ${prioBadge[task.prioridad]}">${task.prioridad}</span>
+              <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 ml-1">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500"></i> ${task.fechaLimite}
               </span>
             </div>
 
-            <button onclick="completeTask('${task.id}')" title="Marcar como completada" 
-                    class="bg-white/80 hover:bg-emerald-600 hover:text-white text-slate-600 border border-slate-300 p-2 rounded-xl transition shadow-xs hover:scale-105">
-              <i data-lucide="check" class="w-4.5 h-4.5"></i>
+            <button onclick="completeTask('${task.id}')" title="Marcar como Finalizado / Aprobado" 
+                    class="bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 p-2 rounded transition shadow-xs hover:scale-105">
+              <i data-lucide="check" class="w-4 h-4"></i>
             </button>
           </div>
         `;
@@ -433,6 +500,8 @@
       lucide.createIcons();
     }
 
+    // Inicializar tema y datos
+    initTheme();
     document.getElementById('fechaLimite').value = new Date().toISOString().split('T')[0];
     fetchTasks();
   </script>
