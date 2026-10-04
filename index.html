@@ -1,99 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pastel To-Do List</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    /* Estilo claro con tonos pastel */
-    body {
-      background-color: #f9f9f9; /* Fondo claro */
-      color: #333;
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 20px;
-      color: #7b68ee; /* Lila pastel */
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    #add-task {
-      background-color: #7b68ee; /* Lila pastel */
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    #add-task:hover {
-      background-color: #6a5acd; /* Lila oscuro */
-    }
-
-    .list-group-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .list-group-item.completed span.task-text {
-      text-decoration: line-through;
-      color: #ccc;
-    }
-
-    .list-group-item input[type="checkbox"] {
-      accent-color: #7b68ee; /* Color del checkbox */
-      margin-right: 10px;
-    }
-
-    .task-time {
-      font-size: 0.9rem;
-      color: #6c757d; /* Gris suave */
-    }
-
-    .delete-button {
-      background-color: #e74c3c; /* Rojo pastel */
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .delete-button:hover {
-      background-color: #c0392b; /* Rojo más oscuro */
-    }
-  </style>
+  <title>TaskMaster - Gestor de Tareas</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
-  <div class="container">
-    <h1>To-Do List</h1>
+<body class="bg-slate-100 text-slate-800 min-h-screen antialiased flex flex-col">
 
-    <div class="input-group">
-      <input type="text" id="task-input" class="form-control" placeholder="Enter a task...">
-      <select id="task-time" class="form-select">
-        <!-- Opciones generadas dinámicamente en JavaScript -->
-      </select>
-      <button id="add-task" class="btn">Add Task</button>
+  <!-- Header Principal -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="bg-indigo-600 p-2 rounded-xl text-white shadow-md shadow-indigo-600/20">
+          <i data-lucide="check-square" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base text-slate-900 leading-none">TaskMaster</h1>
+          <span class="text-[11px] text-slate-400">Google Sheets Sync</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-2">
+        <button onclick="toggleForm()" class="flex items-center space-x-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl transition font-medium shadow-sm shadow-indigo-600/20">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Nueva Tarea</span>
+        </button>
+        <button onclick="fetchTasks()" title="Sincronizar" class="p-2 text-slate-600 hover:bg-slate-100 rounded-xl border border-slate-200 transition">
+          <i data-lucide="refresh-cw" id="syncIcon" class="w-4 h-4"></i>
+        </button>
+      </div>
     </div>
+  </header>
 
-    <ul id="todo-list" class="list-group"></ul>
-  </div>
+  <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow space-y-6">
 
-  <!-- Bootstrap JS and Popper.js (optional for advanced components) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="app.js"></script>
+    <!-- Resumen / Métricas Rápidas -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Pendientes</p>
+          <p id="statTotal" class="text-xl font-extrabold text-slate-800 mt-0.5">0</p>
+        </div>
+        <div class="bg-slate-100 text-slate-600 p-2.5 rounded-xl"><i data-lucide="list-todo" class="w-4 h-4"></i></div>
+      </div>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Alta Prioridad</p>
+          <p id="statHigh" class="text-xl font-extrabold text-red-600 mt-0.5">0</p>
+        </div>
+        <div class="bg-red-50 text-red-600 p-2.5 rounded-xl"><i data-lucide="alert-circle" class="w-4 h-4"></i></div>
+      </div>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Por Vencer</p>
+          <p id="statDue" class="text-xl font-extrabold text-amber-600 mt-0.5">0</p>
+        </div>
+        <div class="bg-amber-50 text-amber-600 p-2.5 rounded-xl"><i data-lucide="clock" class="w-4 h-4"></i></div>
+      </div>
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Categorías</p>
+          <p id="statCat" class="text-xl font-extrabold text-indigo-600 mt-0.5">0</p>
+        </div>
+        <div class="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl"><i data-lucide="folder" class="w-4 h-4"></i></div>
+      </div>
+    </section>
+
+    <!-- Formulario Plegable para Nueva Tarea -->
+    <section id="formContainer" class="hidden transition-all duration-300">
+      <div class="bg-white border border-indigo-100 rounded-2xl p-5 shadow-lg ring-1 ring-indigo-500/10">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-600"></i> Crear Nueva Tarea
+          </h2>
+          <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+        
+        <form id="taskForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Descripción</label>
+            <input type="text" id="descripcion" placeholder="Escribe el nombre de la tarea..." required 
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-sm transition">
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Categoría</label>
+              <select id="categoria" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+                <option value="Clases">📚 Clases</option>
+                <option value="Tutoría">👤 Tutoría</option>
+                <option value="Gestión">💼 Gestión</option>
+                <option value="Otros">📌 Otros</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Prioridad</label>
+              <select id="prioridad" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+                <option value="Alta">🔴 Alta</option>
+                <option value="Media" selected>🟡 Media</option>
+                <option value="Baja">🟢 Baja</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Fecha Límite</label>
+              <input type="date" id="fechaLimite" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+            </div>
+          </div>
+          <div class="flex justify-end space-x-2 pt-2">
+            <button type="button" onclick="toggleForm()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+            <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-5 py-2 rounded-xl transition shadow-md shadow-indigo-600/20 flex items-center space-x-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Guardar Tarea</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Navegación por Pestañas / Filtros -->
+    <section class="space-y-4">
+      <div class="flex border-b border-slate-200 text-xs font-medium text-slate-500 space-x-6">
+        <button onclick="setFilter('all')" id="tabAll" class="pb-2.5 border-b-2 border-indigo-600 text-indigo-600 font-semibold flex items-center space-x-2 transition">
+          <span>Todas</span>
+        </button>
+        <button onclick="setFilter('Alta')" id="tabHigh" class="pb-2.5 border-b-2 border-transparent hover:text-slate-800 flex items-center space-x-2 transition">
+          <span>Alta Prioridad</span>
+        </button>
+        <button onclick="setFilter('Urgent')" id="tabUrgent" class="pb-2.5 border-b-2 border-transparent hover:text-slate-800 flex items-center space-x-2 transition">
+          <span>Por Vencer</span>
+        </button>
+      </div>
+
+      <!-- Estado de Carga -->
+      <div id="loading" class="text-center py-12 text-slate-400 space-y-2">
+        <i data-lucide="loader-2" class="w-7 h-7 animate-spin mx-auto text-indigo-600"></i>
+        <p class="text-xs font-medium">Sincronizando tareas...</p>
+      </div>
+
+      <!-- Lista de Tareas -->
+      <div id="taskList" class="space-y-2"></div>
+    </section>
+
+  </main>
+
+  <script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbuFnsJl63dcRAWZqO1vGLszyNES4lZSkkd8vPo078-wRvnavbw_UUy5OZZUmdUXWY/exec";
+
+    let tasks = [];
+    let currentFilter = 'all';
+
+    function toggleForm() {
+      const form = document.getElementById('formContainer');
+      form.classList.toggle('hidden');
+    }
+
+    async function fetchTasks() {
+      const syncIcon = document.getElementById('syncIcon');
+      const loading = document.getElementById('loading');
+      syncIcon.classList.add('animate-spin');
+      if (tasks.length === 0) loading.classList.remove('hidden');
+
+      try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        tasks = await response.json();
+        renderTasks();
+      } catch (err) {
+        alert("Error al sincronizar datos: " + err.message);
+      } finally {
+        syncIcon.classList.remove('animate-spin');
+        loading.classList.add('hidden');
+      }
+    }
+
+    document.getElementById('taskForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Guardando...</span>';
+      lucide.createIcons();
+
+      const newTask = {
+        id: "ID-" + Date.now(),
+        descripcion: document.getElementById('descripcion').value,
+        categoria: document.getElementById('categoria').value,
+        prioridad: document.getElementById('prioridad').value,
+        fechaInclusion: new Date().toISOString().split('T')[0],
+        fechaLimite: document.getElementById('fechaLimite').value
+      };
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: "create", task: newTask })
+        });
+        document.getElementById('taskForm').reset();
+        toggleForm();
+        setTimeout(fetchTasks, 1000);
+      } catch (err) {
+        alert("Error al guardar: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i><span>Guardar Tarea</span>';
+        lucide.createIcons();
+      }
+    });
+
+    async function completeTask(id) {
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: "complete", taskId: id })
+        });
+        tasks = tasks.filter(t => t.id !== id);
+        renderTasks();
+        setTimeout(fetchTasks, 1200);
+      } catch (err) {
+        alert("Error al completar: " + err.message);
+      }
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      const tabs = {
+        'all': 'tabAll',
+        'Alta': 'tabHigh',
+        'Urgent': 'tabUrgent'
+      };
+
+      Object.values(tabs).forEach(tabId => {
+        const btn = document.getElementById(tabId);
+        btn.className = "pb-2.5 border-b-2 border-transparent hover:text-slate-800 flex items-center space-x-2 transition";
+      });
+
+      const activeBtn = document.getElementById(tabs[filter]);
+      activeBtn.className = "pb-2.5 border-b-2 border-indigo-600 text-indigo-600 font-semibold flex items-center space-x-2 transition";
+
+      renderTasks();
+    }
+
+    function updateStats() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('statTotal').innerText = tasks.length;
+      document.getElementById('statHigh').innerText = tasks.filter(t => t.prioridad === 'Alta').length;
+      document.getElementById('statDue').innerText = tasks.filter(t => t.fechaLimite <= today).length;
+      document.getElementById('statCat').innerText = new Set(tasks.map(t => t.categoria)).size;
+    }
+
+    function renderTasks() {
+      updateStats();
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+
+      let filtered = tasks;
+      const today = new Date().toISOString().split('T')[0];
+
+      if (currentFilter === 'Alta') filtered = tasks.filter(t => t.prioridad === 'Alta');
+      if (currentFilter === 'Urgent') filtered = tasks.filter(t => t.fechaLimite <= today);
+
+      if (!Array.isArray(filtered) || filtered.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
+            <i data-lucide="check-circle-2" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+            <p class="text-xs text-slate-400 font-medium">No hay tareas pendientes en esta sección.</p>
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      const prioColor = {
+        'Alta': 'bg-red-50 text-red-700 border-red-200/60',
+        'Media': 'bg-amber-50 text-amber-700 border-amber-200/60',
+        'Baja': 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
+      };
+
+      filtered.forEach(task => {
+        const isOverdue = task.fechaLimite < today;
+        const item = document.createElement('div');
+        item.className = 'bg-white border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between hover:shadow-md hover:border-slate-300 transition duration-150 group';
+        item.innerHTML = `
+          <div class="space-y-1 pr-3">
+            <div class="flex items-center space-x-2">
+              <span class="font-medium text-slate-800 text-sm leading-snug">${task.descripcion}</span>
+              ${isOverdue ? '<span class="text-[10px] bg-red-100 text-red-700 font-medium px-1.5 py-0.5 rounded">Vencida</span>' : ''}
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+              <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[11px] font-medium">${task.categoria}</span>
+              <span class="px-2 py-0.5 rounded-md border text-[11px] font-medium ${prioColor[task.prioridad]}">${task.prioridad}</span>
+              <span class="flex items-center gap-1 text-[11px] text-slate-400"><i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i> ${task.fechaLimite}</span>
+            </div>
+          </div>
+          <button onclick="completeTask('${task.id}')" title="Marcar como completada" 
+                  class="bg-slate-50 hover:bg-emerald-600 hover:text-white text-slate-400 hover:border-emerald-600 border border-slate-200 p-2 rounded-xl transition flex-shrink-0">
+            <i data-lucide="check" class="w-4 h-4"></i>
+          </button>
+        `;
+        list.appendChild(item);
+      });
+
+      lucide.createIcons();
+    }
+
+    document.getElementById('fechaLimite').value = new Date().toISOString().split('T')[0];
+    fetchTasks();
+  </script>
 </body>
 </html>
