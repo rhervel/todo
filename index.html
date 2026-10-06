@@ -142,14 +142,14 @@
 
         <!-- Selector de Pestañas Tipo Módulo CAD -->
         <div class="flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-300 dark:border-slate-800 font-mono text-xs w-full sm:w-auto">
-          <button onclick="switchTab('horario')" id="navTabHorario" class="flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md">
+          <button onclick="switchTab('bitacora')" id="navTabBitacora" class="flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md">
             <i data-lucide="calendar" class="w-4 h-4"></i>
-            <span>TAB-01: HORARIO</span>
-          </button>
-          <button onclick="switchTab('bitacora')" id="navTabBitacora" class="flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2">
-            <i data-lucide="list-todo" class="w-4 h-4"></i>
-            <span>TAB-02: BITÁCORA</span>
+            <span>TAB-01: BITÁCORA</span>
             <span id="tabBadgeTasks" class="bg-slate-300 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] px-1.5 py-0.2 rounded-full ml-1">0</span>
+          </button>
+          <button onclick="switchTab('horario')" id="navTabHorario" class="flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2">
+            <i data-lucide="list-todo" class="w-4 h-4"></i>
+            <span>TAB-02: HORARIO</span>
           </button>
         </div>
 
@@ -168,390 +168,11 @@
 
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
 
-      <!-- =================================================================== -->
-      <!-- TAB 1: HORARIO LECTIVO TÉCNICO -->
-      <!-- =================================================================== -->
-      <section id="tabHorario" class="space-y-6">
-        
-        <!-- Indicadores Rápidos de Carga Horaria -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase mb-1">
-              <span>[DOCENCIA_DIRECTA]</span>
-              <i data-lucide="book-open" class="w-4 h-4 text-sky-500"></i>
-            </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-slate-100">14 H</p>
-            <div class="text-[10px] text-slate-500 mt-0.5">2º ESO (A, B, C, D)</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-300 dark:border-rose-900/40 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-rose-600 dark:text-rose-400 text-[10px] uppercase mb-1">
-              <span>[GUARDIAS]</span>
-              <i data-lucide="shield-alert" class="w-4 h-4"></i>
-            </div>
-            <p class="text-2xl font-bold text-rose-600 dark:text-rose-400">3 H</p>
-            <div class="text-[10px] text-rose-600/80 dark:text-rose-500/80 mt-0.5">Aula + Recreo ESO</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-pink-300 dark:border-pink-900/40 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-pink-600 dark:text-pink-400 text-[10px] uppercase mb-1">
-              <span>[TUTORÍAS]</span>
-              <i data-lucide="users" class="w-4 h-4"></i>
-            </div>
-            <p class="text-2xl font-bold text-pink-600 dark:text-pink-400">2 H</p>
-            <div class="text-[10px] text-pink-600/80 dark:text-pink-500/80 mt-0.5">Atención 2º ESO C</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase mb-1">
-              <span>[GESTIÓN_PLAN]</span>
-              <i data-lucide="folder-git2" class="w-4 h-4 text-emerald-500"></i>
-            </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-slate-100">3 H</p>
-            <div class="text-[10px] text-slate-500 mt-0.5">REDEP & Coordinación</div>
-          </div>
-        </div>
-
-        <!-- Tabla Estilo Plano de Distribución / Horario -->
-        <div class="bg-white/95 dark:bg-slate-900/95 border border-slate-300 dark:border-slate-800 rounded-xl p-4 md:p-6 shadow-xl relative overflow-hidden transition-colors duration-200">
-          
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4 mb-4 font-mono">
-            <div>
-              <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <i data-lucide="layout-grid" class="w-5 h-5 text-sky-500"></i> DISTRIBUCIÓN SEMANAL DE CARGA LECTIVA
-              </h2>
-              <p class="text-xs text-slate-500 mt-0.5">PLANO TÉCNICO // CURSO 2026-2027</p>
-            </div>
-            <div class="text-[11px] bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded text-slate-600 dark:text-slate-300">
-              CÓDIGO: <span class="text-sky-600 dark:text-sky-400 font-bold">HOR-TYD-2627</span>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-center border-collapse font-mono text-xs min-w-[700px]">
-              <thead>
-                <tr class="bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-b-2 border-slate-300 dark:border-slate-800">
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-28">FRANJA / HORA</th>
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">LUNES</th>
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">MARTES</th>
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">MIÉRCOLES</th>
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">JUEVES</th>
-                  <th class="p-3 w-1/5">VIERNES</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                
-                <!-- 08:15 - 09:15 -->
-                <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">08:15 - 09:15</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO A / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(30 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO B / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(33 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO B / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(33 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C1 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2">
-                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C1 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- 09:15 - 10:15 -->
-                <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">09:15 - 10:15</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-guardia p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>GUARDIA</span>
-                        <button onclick="createTaskFromSchedule('Guardia 1ª Hora Lunes', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">Servicio de Guardia</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-guardia p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>GUARDIA</span>
-                        <button onclick="createTaskFromSchedule('Guardia 2ª Hora Martes', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">Servicio de Guardia</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO A / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(30 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-tutoria p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>TUTORÍA LECTIVA</span>
-                        <button onclick="createTaskFromSchedule('Tutoría 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">2º ESO C (30 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2">
-                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO A / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(30 alumn.)</div>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- 10:15 - 11:15 -->
-                <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">10:15 - 11:15</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO D / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(27 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO D / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(27 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C1 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>PLAN DE CENTRO</span>
-                        <button onclick="createTaskFromSchedule('Plan de Centro', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">Otras Activ. Lectivas</div>
-                    </div>
-                  </td>
-                  <td class="p-2">
-                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO B / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(33 alumn.)</div>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- RECREO: 11:15 - 11:45 -->
-                <tr class="bg-slate-100/60 dark:bg-slate-950/60">
-                  <td class="p-2 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800 text-[10px]">11:15 - 11:45</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-guardia p-1.5 rounded border text-[10px] font-bold">GUARDIA RECREO (ESO)</div>
-                  </td>
-                  <td colspan="4" class="p-2 text-slate-400 dark:text-slate-600 text-[10px] font-mono uppercase tracking-widest">// DESCANSO LECTIVO / RECREO //</td>
-                </tr>
-
-                <!-- 11:45 - 12:45 -->
-                <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">11:45 - 12:45</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-tutoria p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>TUTORÍA ATENCIÓN</span>
-                        <button onclick="createTaskFromSchedule('Atención Familias 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">Personalizada 2º ESO C</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C2 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700 text-[10px]">- LIBRE -</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C2 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2">
-                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>PROGRAMACIÓN</span>
-                        <button onclick="createTaskFromSchedule('Programación de Actividades', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">Actividades Educativas</div>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- 12:45 - 13:45 -->
-                <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">12:45 - 13:45</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>COORDINACIÓN</span>
-                        <button onclick="createTaskFromSchedule('Coordinación Docente / Materiales', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">Docente / Materiales</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700 text-[10px]">- LIBRE -</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>REDEP</span>
-                        <button onclick="createTaskFromSchedule('Reunión REDEP', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">Red de Profesorado</div>
-                    </div>
-                  </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO D / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(27 alumn.)</div>
-                    </div>
-                  </td>
-                  <td class="p-2">
-                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C2 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
-                      </div>
-                      <div class="text-[10px] opacity-80">(15 alumn.)</div>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- 13:45 - 14:45 -->
-                <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">13:45 - 14:45</td>
-                  <td colspan="5" class="p-2 text-slate-400 dark:text-slate-700 text-[10px] font-mono tracking-widest">// SIN CARGA LECTIVA ASIGNADA //</td>
-                </tr>
-
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Leyenda Técnica de Capas/Colores -->
-          <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-3 font-mono text-[11px]">
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-a inline-block border"></span> 2º ESO A</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-b inline-block border"></span> 2º ESO B</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-c1 inline-block border"></span> 2º ESO C1</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-c2 inline-block border"></span> 2º ESO C2</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-d inline-block border"></span> 2º ESO D</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-guardia inline-block border"></span> Guardias</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-tutoria inline-block border"></span> Tutorías</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-gestion inline-block border"></span> Coordinación / Gestión</div>
-          </div>
-
-        </div>
-      </section>
 
       <!-- =================================================================== -->
       <!-- TAB 2: BITÁCORA TÉCNICA DE TAREAS -->
       <!-- =================================================================== -->
-      <section id="tabBitacora" class="hidden space-y-6">
-        
-        <!-- Métricas de Bitácora -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase mb-1">
-              <span>[TOTAL_PENDIENTES]</span>
-              <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
-            </div>
-            <p id="statTotal" class="text-2xl font-bold text-slate-900 dark:text-slate-100">0</p>
-            <div class="text-[10px] text-slate-500 mt-0.5">Registros activos</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-300 dark:border-rose-900/40 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-rose-600 dark:text-rose-400 text-[10px] uppercase mb-1">
-              <span>[PRIORIDAD_CRÍTICA]</span>
-              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i>
-            </div>
-            <p id="statHigh" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</p>
-            <div class="text-[10px] text-rose-600/80 dark:text-rose-500/80 mt-0.5">Acción inmediata</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-amber-300 dark:border-amber-900/40 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-amber-600 dark:text-amber-400 text-[10px] uppercase mb-1">
-              <span>[POR_VENCER]</span>
-              <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i>
-            </div>
-            <p id="statDue" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</p>
-            <div class="text-[10px] text-amber-700/80 dark:text-amber-500/80 mt-0.5">Fecha límite alcanzada</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-sky-300 dark:border-sky-900/40 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-sky-600 dark:text-sky-400 text-[10px] uppercase mb-1">
-              <span>[MÓDULOS]</span>
-              <i data-lucide="grid" class="w-4 h-4 text-sky-500"></i>
-            </div>
-            <p id="statCat" class="text-2xl font-bold text-sky-600 dark:text-sky-400">0</p>
-            <div class="text-[10px] text-sky-700/80 dark:text-sky-500/80 mt-0.5">Categorías de proyecto</div>
-          </div>
-        </div>
+      <section id="tabBitacora" class="space-y-6">
 
         <!-- Formulario Plegable para Nueva Tarea -->
         <section id="formContainer" class="transition-all duration-300">
@@ -631,7 +252,349 @@
           <!-- Lista de Tareas -->
           <div id="taskList" class="flex flex-col space-y-3 pt-1"></div>
         </div>
+        <!-- Métricas de Bitácora -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase mb-1">
+              <span>[TOTAL_PENDIENTES]</span>
+              <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
+            </div>
+            <p id="statTotal" class="text-2xl font-bold text-slate-900 dark:text-slate-100">0</p>
+            <div class="text-[10px] text-slate-500 mt-0.5">Registros activos</div>
+          </div>
 
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-300 dark:border-rose-900/40 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-rose-600 dark:text-rose-400 text-[10px] uppercase mb-1">
+              <span>[PRIORIDAD_CRÍTICA]</span>
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i>
+            </div>
+            <p id="statHigh" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</p>
+            <div class="text-[10px] text-rose-600/80 dark:text-rose-500/80 mt-0.5">Acción inmediata</div>
+          </div>
+
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-amber-300 dark:border-amber-900/40 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-amber-600 dark:text-amber-400 text-[10px] uppercase mb-1">
+              <span>[POR_VENCER]</span>
+              <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i>
+            </div>
+            <p id="statDue" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</p>
+            <div class="text-[10px] text-amber-700/80 dark:text-amber-500/80 mt-0.5">Fecha límite alcanzada</div>
+          </div>
+
+          <div class="bg-white/90 dark:bg-slate-900/90 border border-sky-300 dark:border-sky-900/40 p-3.5 rounded-lg shadow-xs">
+            <div class="flex items-center justify-between text-sky-600 dark:text-sky-400 text-[10px] uppercase mb-1">
+              <span>[MÓDULOS]</span>
+              <i data-lucide="grid" class="w-4 h-4 text-sky-500"></i>
+            </div>
+            <p id="statCat" class="text-2xl font-bold text-sky-600 dark:text-sky-400">0</p>
+            <div class="text-[10px] text-sky-700/80 dark:text-sky-500/80 mt-0.5">Categorías de proyecto</div>
+          </div>
+        </div>
+
+
+
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 1: HORARIO LECTIVO TÉCNICO -->
+      <!-- =================================================================== -->
+      <section id="tabHorario" class="hidden space-y-6">
+
+        <!-- Tabla Estilo Plano de Distribución / Horario -->
+        <div class="bg-white/95 dark:bg-slate-900/95 border border-slate-300 dark:border-slate-800 rounded-xl p-4 md:p-6 shadow-xl relative overflow-hidden transition-colors duration-200">
+          
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4 mb-4 font-mono">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <i data-lucide="layout-grid" class="w-5 h-5 text-sky-500"></i> DISTRIBUCIÓN SEMANAL DE CARGA LECTIVA
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">PLANO TÉCNICO // CURSO 2026-2027</p>
+            </div>
+            <div class="text-[11px] bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded text-slate-600 dark:text-slate-300">
+              CÓDIGO: <span class="text-sky-600 dark:text-sky-400 font-bold">HOR-TYD-2627</span>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-center border-collapse font-mono text-xs min-w-[700px]">
+              <thead>
+                <tr class="bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-b-2 border-slate-300 dark:border-slate-800">
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-28">FRANJA / HORA</th>
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">LUNES</th>
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">MARTES</th>
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">MIÉRCOLES</th>
+                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">JUEVES</th>
+                  <th class="p-3 w-1/5">VIERNES</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                
+                <!-- 08:15 - 09:15 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">08:15 - 09:15</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO A / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A13</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO B / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A20</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO B / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A20</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C1 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">ATC</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C1 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A17</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- 09:15 - 10:15 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">09:15 - 10:15</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-guardia p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>GUARDIA</span>
+                        <button onclick="createTaskFromSchedule('Guardia 1ª Hora Lunes', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Servicio de Guardia</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-guardia p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>GUARDIA</span>
+                        <button onclick="createTaskFromSchedule('Guardia 2ª Hora Martes', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Servicio de Guardia</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO A / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A13</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-tutoria p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>TUTORÍA LECTIVA</span>
+                        <button onclick="createTaskFromSchedule('Tutoría 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">2º ESO C A17</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO A / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">ATC</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- 10:15 - 11:15 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">10:15 - 11:15</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO D / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A14</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO D / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">ATC</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C1 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">ATC</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>PLAN DE CENTRO</span>
+                        <button onclick="createTaskFromSchedule('Plan de Centro', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Otras Activ. Lectivas</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO B / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A20</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- RECREO: 11:15 - 11:45 -->
+                <tr class="bg-slate-100/60 dark:bg-slate-950/60">
+                  <td class="p-2 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800 text-[10px]">11:15 - 11:45</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-guardia p-1.5 rounded border text-[10px] font-bold">GUARDIA RECREO (ESO)</div>
+                  </td>
+                  <td colspan="4" class="p-2 text-slate-400 dark:text-slate-600 text-[10px] font-mono uppercase tracking-widest">// DESCANSO LECTIVO / RECREO //</td>
+                </tr>
+
+                <!-- 11:45 - 12:45 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">11:45 - 12:45</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-tutoria p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>TUTORÍA ATENCIÓN</span>
+                        <button onclick="createTaskFromSchedule('Atención Familias 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Personalizada 2º ESO C</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C2 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A18</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700 text-[10px]">- LIBRE -</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C2 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A18</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>PROGRAMACIÓN</span>
+                        <button onclick="createTaskFromSchedule('Programación de Actividades', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Actividades Educativas</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- 12:45 - 13:45 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">12:45 - 13:45</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>COORDINACIÓN</span>
+                        <button onclick="createTaskFromSchedule('Coordinación Docente / Materiales', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Docente / Materiales</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700 text-[10px]">- LIBRE -</td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>REDEP</span>
+                        <button onclick="createTaskFromSchedule('Reunión REDEP', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">Reunión Dep.</div>
+                    </div>
+                  </td>
+                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
+                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO D / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A14</div>
+                    </div>
+                  </td>
+                  <td class="p-2">
+                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
+                      <div class="font-bold flex justify-between items-center">
+                        <span>2º ESO C2 / TYD</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                      </div>
+                      <div class="text-[10px] opacity-80">A18</div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- 13:45 - 14:45 -->
+                <tr>
+                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">13:45 - 14:45</td>
+                  <td colspan="5" class="p-2 text-slate-400 dark:text-slate-700 text-[10px] font-mono tracking-widest">// SIN CARGA LECTIVA ASIGNADA //</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Leyenda Técnica de Capas/Colores -->
+          <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-3 font-mono text-[11px]">
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-a inline-block border"></span> 2º ESO A</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-b inline-block border"></span> 2º ESO B</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-c1 inline-block border"></span> 2º ESO C1</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-c2 inline-block border"></span> 2º ESO C2</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-d inline-block border"></span> 2º ESO D</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-guardia inline-block border"></span> Guardias</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-tutoria inline-block border"></span> Tutorías</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-gestion inline-block border"></span> Coordinación / Gestión</div>
+          </div>
+
+        </div>
       </section>
 
     </main>
@@ -692,21 +655,22 @@
 
     // Cambio de Pestañas (Horario / Bitácora)
     function switchTab(tab) {
-      const tabHorario = document.getElementById('tabHorario');
-      const tabBitacora = document.getElementById('tabBitacora');
+      
       const navTabHorario = document.getElementById('navTabHorario');
       const navTabBitacora = document.getElementById('navTabBitacora');
+      const tabHorario = document.getElementById('tabHorario');
+      const tabBitacora = document.getElementById('tabBitacora');
 
-      if (tab === 'horario') {
-        tabHorario.classList.remove('hidden');
-        tabBitacora.classList.add('hidden');
-        navTabHorario.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md";
-        navTabBitacora.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2";
-      } else {
-        tabHorario.classList.add('hidden');
+      if (tab === 'bitacora') {
         tabBitacora.classList.remove('hidden');
+        tabHorario.classList.add('hidden');
         navTabBitacora.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md";
         navTabHorario.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2";
+      } else {
+        tabBitacora.classList.add('hidden');
+        tabHorario.classList.remove('hidden');
+        navTabHorario.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md";
+        navTabBitacora.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2";
       }
       lucide.createIcons();
     }
