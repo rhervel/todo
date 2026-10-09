@@ -3,636 +3,745 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RHV - Sistema Integrado: Horario & Bitácora Técnica</title>
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'><path d='M2 12h20M12 2v20M7 7l10 10M17 7L7 17'/></svg>">
-  <!-- Fonts: JetBrains Mono (técnica) + Plus Jakarta Sans (interfaz) -->
+  <title>RHV - Sistema Integrado: Horario & Bitácora Técnica (iOS 18 Edition)</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2320d0b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Tailwind CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cYellow: '#dfd661',
+            cMint: '#20d0b8',
+            cSky: '#61a9df',
+            cBlue: '#618dec',
+            cPurple: '#9761df',
+          },
+          boxShadow: {
+            'ios-glow': '0 20px 50px -10px rgba(97, 141, 236, 0.25)',
+            'ios-glow-mint': '0 20px 50px -10px rgba(32, 208, 184, 0.25)',
+            'ios-glow-purple': '0 20px 50px -10px rgba(151, 97, 223, 0.25)',
+          }
+        }
+      }
     }
   </script>
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
-    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
-    .font-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    /* Dynamic Ambient Background Light System */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.45;
+      animation: floatOrb 22s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+    .dark .orb { opacity: 0.35; }
 
-    /* Fondo Modo Oscuro: Blueprint Night */
-    .dark .bg-grid-blueprint {
-      background-color: #0b1329;
-      background-image: 
-        linear-gradient(to right, rgba(56, 189, 248, 0.08) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(56, 189, 248, 0.08) 1px, transparent 1px),
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 5px, transparent 5px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 5px, transparent 5px);
-      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      33% { transform: translate(60px, -80px) scale(1.2) rotate(120deg); }
+      66% { transform: translate(-50px, 40px) scale(0.9) rotate(240deg); }
+      100% { transform: translate(30px, -30px) scale(1.1) rotate(360deg); }
     }
 
-    /* Fondo Modo Claro: Papel Milimetrado Técnico (Draft Paper) */
-    .bg-grid-blueprint {
-      background-color: #f8fafc;
-      background-image: 
-        linear-gradient(to right, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
-        linear-gradient(to right, rgba(100, 116, 139, 0.12) 5px, transparent 5px),
-        linear-gradient(to bottom, rgba(100, 116, 139, 0.12) 5px, transparent 5px);
-      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    /* visionOS / iOS 18 Glassmorphism Pro Effects */
+    .ios-glass-nav {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(28px) saturate(210%);
+      -webkit-backdrop-filter: blur(28px) saturate(210%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+    }
+    .dark .ios-glass-nav {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
     }
 
-    /* Cota / Regla de trazado */
-    .blueprint-margin::before {
+    .ios-card {
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 12px 32px 0 rgba(31, 38, 135, 0.06);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dark .ios-card {
+      background: rgba(30, 41, 59, 0.62);
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.35);
+    }
+    .ios-card:hover {
+      transform: translateY(-4px) scale(1.006);
+      box-shadow: 0 20px 40px -5px rgba(97, 141, 236, 0.18);
+    }
+    .dark .ios-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 45px -5px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Interactive Buttons Micro-interactions */
+    .ios-btn {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+    .ios-btn:hover {
+      transform: translateY(-1px);
+    }
+    .ios-btn:active {
+      transform: scale(0.94) translateY(0);
+    }
+
+    /* Materias con Gradientes Especiales de la Paleta Solicitada */
+    .m-eso-a { 
+      background: linear-gradient(135deg, rgba(97, 141, 236, 0.22) 0%, rgba(97, 141, 236, 0.06) 100%); 
+      border-left: 4px solid #618dec; 
+      border-top: 1px solid rgba(97, 141, 236, 0.3);
+    }
+    .m-eso-b { 
+      background: linear-gradient(135deg, rgba(32, 208, 184, 0.22) 0%, rgba(32, 208, 184, 0.06) 100%); 
+      border-left: 4px solid #20d0b8; 
+      border-top: 1px solid rgba(32, 208, 184, 0.3);
+    }
+    .m-eso-c1 { 
+      background: linear-gradient(135deg, rgba(97, 169, 223, 0.22) 0%, rgba(97, 169, 223, 0.06) 100%); 
+      border-left: 4px solid #61a9df; 
+      border-top: 1px solid rgba(97, 169, 223, 0.3);
+    }
+    .m-eso-c2 { 
+      background: linear-gradient(135deg, rgba(151, 97, 223, 0.22) 0%, rgba(151, 97, 223, 0.06) 100%); 
+      border-left: 4px solid #9761df; 
+      border-top: 1px solid rgba(151, 97, 223, 0.3);
+    }
+    .m-eso-d { 
+      background: linear-gradient(135deg, rgba(223, 214, 97, 0.28) 0%, rgba(223, 214, 97, 0.06) 100%); 
+      border-left: 4px solid #dfd661; 
+      border-top: 1px solid rgba(223, 214, 97, 0.4);
+    }
+    .m-guardia { 
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.22) 0%, rgba(244, 63, 94, 0.06) 100%); 
+      border-left: 4px solid #f43f5e; 
+      border-top: 1px solid rgba(244, 63, 94, 0.3);
+    }
+    .m-tutoria { 
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.22) 0%, rgba(236, 72, 153, 0.06) 100%); 
+      border-left: 4px solid #ec4899; 
+      border-top: 1px solid rgba(236, 72, 153, 0.3);
+    }
+    .m-gestion { 
+      background: linear-gradient(135deg, rgba(148, 163, 184, 0.22) 0%, rgba(148, 163, 184, 0.06) 100%); 
+      border-left: 4px solid #94a3b8; 
+      border-top: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    /* iOS Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.7); }
+
+    /* Animated Sheen Shimmer */
+    .sheen {
+      position: relative;
+      overflow: hidden;
+    }
+    .sheen::after {
       content: '';
       position: absolute;
-      top: 0;
-      bottom: 0;
-      left: clamp(8px, 2vw, 24px);
-      width: 1px;
-      z-index: 0;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        60deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 70%
+      );
+      transform: rotate(30deg);
+      animation: sheenMove 6s infinite;
       pointer-events: none;
     }
-    .dark .blueprint-margin::before { background-color: rgba(56, 189, 248, 0.25); }
-    .blueprint-margin::before { background-color: rgba(30, 41, 59, 0.2); }
-
-    /* Tarjetas de Tarea y Celdas estilo Ficha CAD */
-    .blueprint-card {
-      position: relative;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    @keyframes sheenMove {
+      0% { transform: translateX(-100%) rotate(30deg); }
+      20% { transform: translateX(100%) rotate(30deg); }
+      100% { transform: translateX(100%) rotate(30deg); }
     }
-    .dark .blueprint-card { background: #1e293b; border: 1px solid #334155; }
-    .blueprint-card { background: #ffffff; border: 1px solid #cbd5e1; }
-
-    .dark .blueprint-card:hover {
-      border-color: #38bdf8;
-      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.6), 0 0 15px rgba(56, 189, 248, 0.15);
-    }
-    .blueprint-card:hover {
-      border-color: #0284c7;
-      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
-      transform: translateY(-2px);
-    }
-
-    /* Estilos de materias para Modo Claro / Modo Oscuro */
-    .cell-eso-a { background-color: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
-    .dark .cell-eso-a { background-color: #1e1b4b; color: #a5b4fc; border-color: #312e81; }
-
-    .cell-eso-b { background-color: #dcfce7; color: #166534; border-color: #bbf7d0; }
-    .dark .cell-eso-b { background-color: #052e16; color: #86efac; border-color: #14532d; }
-
-    .cell-eso-c1 { background-color: #e0f2fe; color: #075985; border-color: #bae6fd; }
-    .dark .cell-eso-c1 { background-color: #0c4a6e; color: #7dd3fc; border-color: #0369a1; }
-
-    .cell-eso-c2 { background-color: #ccfbf1; color: #115e59; border-color: #99f6e4; }
-    .dark .cell-eso-c2 { background-color: #042f2e; color: #5eead4; border-color: #134e4a; }
-
-    .cell-eso-d { background-color: #fef9c3; color: #854d0e; border-color: #fef08a; }
-    .dark .cell-eso-d { background-color: #422006; color: #fde047; border-color: #713f12; }
-
-    .cell-guardia { background-color: #ffe4e6; color: #9f1239; border-color: #fecdd3; }
-    .dark .cell-guardia { background-color: #4c0519; color: #fda4af; border-color: #881337; }
-
-    .cell-tutoria { background-color: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
-    .dark .cell-tutoria { background-color: #500724; color: #f472b6; border-color: #831843; }
-
-    .cell-gestion { background-color: #f1f5f9; color: #334155; border-color: #e2e8f0; }
-    .dark .cell-gestion { background-color: #0f172a; color: #94a3b8; border-color: #1e293b; }
-
-    
   </style>
 </head>
-<body class="bg-grid-blueprint blueprint-margin font-sans text-slate-800 dark:text-slate-200 min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white transition-colors duration-200">
+<body class="bg-slate-100 dark:bg-[#070a12] text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-500 relative selection:bg-[#618dec] selection:text-white">
 
-  <!-- Contenedor Principal -->
+  <!-- Ambient Light Orbs (5 Colores de la paleta oficial) -->
+  <div class="ambient-bg">
+    <div class="orb w-[500px] h-[500px] bg-[#618dec] top-[-150px] left-[-150px]"></div>
+    <div class="orb w-[550px] h-[550px] bg-[#9761df] top-[20%] right-[-150px]" style="animation-delay: -4s;"></div>
+    <div class="orb w-[480px] h-[480px] bg-[#20d0b8] bottom-[15%] left-[5%]" style="animation-delay: -8s;"></div>
+    <div class="orb w-[520px] h-[520px] bg-[#dfd661] bottom-[-150px] right-[15%]" style="animation-delay: -12s;"></div>
+    <div class="orb w-[450px] h-[450px] bg-[#61a9df] top-[45%] left-[35%]" style="animation-delay: -16s;"></div>
+  </div>
+
   <div class="relative z-10 flex-grow">
-
-    <!-- Encabezado / Cajetín Principal -->
-    <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-300 dark:border-slate-800 sticky top-0 z-40 shadow-sm dark:shadow-2xl transition-colors duration-200">
-      <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+    
+    <!-- iOS Header / Floating Navigation Bar -->
+    <header class="sticky top-4 z-50 max-w-7xl mx-auto px-4 my-3">
+      <div class="ios-glass-nav rounded-3xl p-3 md:px-6 md:py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
         
-        <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
-          <div class="flex items-center space-x-3">
-            <div class="bg-sky-500/10 border border-sky-500/30 p-2.5 rounded-lg text-sky-600 dark:text-sky-400 shadow-xs">
-              <i data-lucide="compass" class="w-6 h-6"></i>
+        <div class="flex items-center justify-between w-full sm:w-auto">
+          <div class="flex items-center space-x-3.5">
+            <div class="relative group">
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#618dec] via-[#20d0b8] to-[#9761df] p-[2px] shadow-lg shadow-[#618dec]/30 group-hover:scale-105 transition duration-300">
+                <div class="w-full h-full bg-slate-900/90 dark:bg-slate-950/90 rounded-[14px] flex items-center justify-center">
+                  <i data-lucide="sparkles" class="w-5 h-5 text-[#20d0b8] animate-pulse"></i>
+                </div>
+              </div>
+              <div class="absolute -top-1 -right-1 w-3 h-3 bg-[#20d0b8] rounded-full border-2 border-white dark:border-slate-900"></div>
             </div>
             <div>
               <div class="flex items-center space-x-2">
-                <h1 class="font-bold text-base md:text-lg text-slate-900 dark:text-slate-100 tracking-tight font-mono">RHV // SISTEMA INTEGRADO</h1>
-                <span class="text-[10px] font-mono px-1.5 py-0.5 bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400 border border-sky-300 dark:border-sky-800 rounded">REV. 26/27</span>
+                <h1 class="font-extrabold text-base md:text-lg tracking-tight bg-gradient-to-r from-slate-900 via-[#618dec] to-[#9761df] dark:from-white dark:via-[#61a9df] dark:to-[#9761df] bg-clip-text text-transparent">RHV SYSTEM</h1>
+                <span class="text-[10px] font-extrabold font-mono px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#dfd661]/40 via-[#20d0b8]/30 to-[#9761df]/30 text-slate-800 dark:text-white border border-[#dfd661]/60 shadow-xs">iOS 18</span>
               </div>
-              <div class="flex items-center space-x-2">
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 dark:animate-pulse"></span>
-                <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400">PLANOS DE AULA & BITÁCORA SYNC</span>
-              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Horario & Bitácora de Gestión Integrada</p>
             </div>
           </div>
 
-          <!-- Botón Modo Oscuro Móvil -->
-          <button onclick="toggleTheme()" title="Cambiar tema" class="sm:hidden p-2 text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded border border-slate-300 dark:border-slate-700">
-            <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
-            <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-amber-600"></i>
+          <button onclick="toggleTheme()" class="sm:hidden p-2.5 rounded-2xl bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 ios-btn">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block text-[#9761df]"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-[#dfd661]"></i>
           </button>
         </div>
 
-        <!-- Selector de Pestañas Tipo Módulo CAD -->
-        <div class="flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-300 dark:border-slate-800 font-mono text-xs w-full sm:w-auto">
-          <button onclick="switchTab('bitacora')" id="navTabBitacora" class="flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md">
-            <i data-lucide="calendar" class="w-4 h-4"></i>
-            <span>TAB-01: BITÁCORA</span>
-            <span id="tabBadgeTasks" class="bg-slate-300 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] px-1.5 py-0.2 rounded-full ml-1">0</span>
+        <!-- Segmented Control Tabs iOS 18 -->
+        <div class="bg-slate-200/80 dark:bg-slate-950/80 p-1.5 rounded-2xl flex items-center space-x-1 w-full sm:w-auto border border-white/40 dark:border-white/10 shadow-inner">
+          <button onclick="switchTab('bitacora')" id="navTabBitacora" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center space-x-2 bg-gradient-to-r from-[#618dec] via-[#20d0b8] to-[#9761df] text-white shadow-md shadow-[#618dec]/30 sheen ios-btn">
+            <i data-lucide="layout-list" class="w-4 h-4"></i>
+            <span>BITÁCORA</span>
+            <span id="tabBadgeTasks" class="bg-white/30 text-white text-[10px] px-2 py-0.5 rounded-full ml-1 font-mono font-bold">0</span>
           </button>
-          <button onclick="switchTab('horario')" id="navTabHorario" class="flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2">
-            <i data-lucide="list-todo" class="w-4 h-4"></i>
-            <span>TAB-02: HORARIO</span>
+          <button onclick="switchTab('horario')" id="navTabHorario" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-300 flex items-center justify-center space-x-2 ios-btn">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>HORARIO</span>
           </button>
         </div>
 
         <div class="hidden sm:flex items-center space-x-2">
-          <button onclick="toggleTheme()" title="Cambiar tema" class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-300 dark:border-slate-700 transition">
-            <i data-lucide="moon" id="themeIconDark" class="w-4 h-4 hidden dark:block"></i>
-            <i data-lucide="sun" id="themeIconLight" class="w-4 h-4 block dark:hidden text-amber-600"></i>
+          <button onclick="toggleTheme()" title="Cambiar tema visual" class="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-200 hover:scale-105 ios-btn shadow-sm">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block text-[#9761df]"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-[#dfd661]"></i>
           </button>
-
-          <button onclick="fetchTasks()" title="Sincronizar Datos" class="p-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md border border-slate-300 dark:border-slate-700 transition flex items-center gap-1.5 font-mono text-xs">
-            <i data-lucide="refresh-cw" id="syncIcon" class="w-4 h-4"></i>
+          <button onclick="fetchTasks()" title="Sincronizar con Google Sheets" class="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 text-slate-700 dark:text-slate-200 hover:scale-105 ios-btn shadow-sm flex items-center justify-center">
+            <i data-lucide="refresh-cw" id="syncIcon" class="w-4 h-4 text-[#20d0b8]"></i>
           </button>
         </div>
+
       </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
+    <main class="max-w-7xl mx-auto px-4 py-4 space-y-6">
 
-
-      <!-- =================================================================== -->
-      <!-- TAB 2: BITÁCORA TÉCNICA DE TAREAS -->
-      <!-- =================================================================== -->
+      <!-- ================= BITÁCORA TAB ================= -->
       <section id="tabBitacora" class="space-y-6">
 
-        <!-- Formulario Plegable para Nueva Tarea -->
+        <!-- Formulario Plegable Estilo iOS Glass Modal Card -->
         <section id="formContainer" class="transition-all duration-300">
-          <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl p-6 shadow-xl relative transition-colors duration-200">
-            <div class="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
-              <h2 class="text-sm font-mono font-bold text-sky-700 dark:text-sky-400 flex items-center gap-2 uppercase tracking-wide">
-                <i data-lucide="pen-tool" class="w-4 h-4 text-sky-500"></i> // Entrada de Especificación Técnica
-              </h2>
-              <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded">
+          <div class="ios-card rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-48 h-48 bg-gradient-to-br from-[#20d0b8]/30 to-[#618dec]/20 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-between mb-6 border-b border-slate-200/80 dark:border-slate-700/60 pb-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#20d0b8]/30 to-[#618dec]/30 flex items-center justify-center text-[#20d0b8] border border-[#20d0b8]/40 shadow-sm">
+                  <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h2 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">Nueva Entrada en Bitácora</h2>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Registra tareas pendientes para sincronizar</p>
+                </div>
+              </div>
+              <button onclick="toggleForm()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-2xl hover:bg-slate-200/60 dark:hover:bg-slate-800/60 ios-btn">
                 <i data-lucide="x" class="w-5 h-5"></i>
               </button>
             </div>
-            
-            <form id="taskForm" class="space-y-4 font-mono text-xs">
+
+            <form id="taskForm" class="space-y-5 text-sm">
               <div>
-                <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Descripción del Requerimiento / Tarea</label>
-                <input type="text" id="descripcion" placeholder="Ej: Corregir exámen 2º ESO A / Preparar memoria de taller..." required 
-                       class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-sky-500 text-sm transition">
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Descripción del Requerimiento</label>
+                <input type="text" id="descripcion" placeholder="Ej: Corregir examen 2º ESO A / Preparar memoria..." required
+                       class="w-full bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-4 py-3.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#618dec] transition shadow-inner">
               </div>
+
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Categoría / Módulo</label>
-                  <select id="categoria" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                  <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Categoría</label>
+                  <select id="categoria" class="w-full bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-4 py-3.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#618dec] transition">
                     <option value="Clases">📐 Clases / Docencia</option>
                     <option value="Tutoría">👤 Tutoría / Atención</option>
                     <option value="Gestión">💼 Gestión / Coordinación</option>
                     <option value="Otros">📌 Inspección / Otros</option>
                   </select>
                 </div>
+
                 <div>
-                  <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Nivel de Prioridad</label>
-                  <select id="prioridad" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                  <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Prioridad</label>
+                  <select id="prioridad" class="w-full bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-4 py-3.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#618dec] transition">
                     <option value="Alta">🔴 Alta [Crítica]</option>
                     <option value="Media" selected>🟡 Media [Estándar]</option>
                     <option value="Baja">🟢 Baja [Secundaria]</option>
                   </select>
                 </div>
+
                 <div>
-                  <label class="block text-slate-600 dark:text-slate-400 mb-1 uppercase text-[10px] tracking-wider">Fecha Límite [Deadline]</label>
-                  <input type="date" id="fechaLimite" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-md px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                  <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Fecha Límite</label>
+                  <input type="date" id="fechaLimite" required class="w-full bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-4 py-3.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#618dec] transition">
                 </div>
               </div>
-              <div class="flex justify-end space-x-3 pt-3 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onclick="toggleForm()" class="px-4 py-2 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancelar</button>
-                <button type="submit" id="submitBtn" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-5 py-2.5 rounded transition shadow-md flex items-center space-x-2">
-                  <i data-lucide="check-square" class="w-4 h-4"></i>
-                  <span>REGISTRAR EN BITÁCORA</span>
+
+              <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200/80 dark:border-slate-700/60">
+                <button type="button" onclick="toggleForm()" class="px-5 py-2.5 rounded-2xl text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200/60 dark:hover:bg-slate-800/60 transition ios-btn">Cancelar</button>
+                <button type="submit" id="submitBtn" class="bg-gradient-to-r from-[#20d0b8] via-[#618dec] to-[#9761df] text-white font-extrabold px-7 py-3 rounded-2xl transition-all shadow-lg shadow-[#20d0b8]/25 flex items-center space-x-2 sheen ios-btn">
+                  <i data-lucide="check" class="w-4 h-4"></i>
+                  <span>Registrar Tarea</span>
                 </button>
               </div>
             </form>
           </div>
         </section>
 
-        <!-- Filtros y Lista de Tareas -->
+        <!-- Widgets de Métricas Estilo iOS Dashboard -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="ios-card rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group border-t-2 border-t-[#618dec]">
+            <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-[#618dec]/15 rounded-full blur-xl group-hover:scale-150 transition-all duration-500"></div>
+            <div class="flex justify-between items-center text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
+              <span>Pendientes</span>
+              <div class="p-2.5 rounded-2xl bg-[#618dec]/20 text-[#618dec]">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <p id="statTotal" class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">0</p>
+              <p class="text-[11px] text-slate-400 font-semibold mt-0.5">Registros activos</p>
+            </div>
+          </div>
+
+          <div class="ios-card rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group border-t-2 border-t-rose-500">
+            <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-rose-500/15 rounded-full blur-xl group-hover:scale-150 transition-all duration-500"></div>
+            <div class="flex justify-between items-center text-rose-500 text-xs font-bold uppercase tracking-wider">
+              <span>Prioridad Alta</span>
+              <div class="p-2.5 rounded-2xl bg-rose-500/20 text-rose-500">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <p id="statHigh" class="text-3xl sm:text-4xl font-extrabold text-rose-500 tracking-tight">0</p>
+              <p class="text-[11px] text-rose-400/80 font-semibold mt-0.5">Acción requerida</p>
+            </div>
+          </div>
+
+          <div class="ios-card rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group border-t-2 border-t-[#dfd661]">
+            <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-[#dfd661]/25 rounded-full blur-xl group-hover:scale-150 transition-all duration-500"></div>
+            <div class="flex justify-between items-center text-[#b5ab30] dark:text-[#dfd661] text-xs font-bold uppercase tracking-wider">
+              <span>Por Vencer</span>
+              <div class="p-2.5 rounded-2xl bg-[#dfd661]/25 text-[#9a9117] dark:text-[#dfd661]">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <p id="statDue" class="text-3xl sm:text-4xl font-extrabold text-[#9a9117] dark:text-[#dfd661] tracking-tight">0</p>
+              <p class="text-[11px] text-amber-500/80 font-semibold mt-0.5">Límite cercano</p>
+            </div>
+          </div>
+
+          <div class="ios-card rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group border-t-2 border-t-[#9761df]">
+            <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-[#9761df]/15 rounded-full blur-xl group-hover:scale-150 transition-all duration-500"></div>
+            <div class="flex justify-between items-center text-[#9761df] text-xs font-bold uppercase tracking-wider">
+              <span>Categorías</span>
+              <div class="p-2.5 rounded-2xl bg-[#9761df]/20 text-[#9761df]">
+                <i data-lucide="grid" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <p id="statCat" class="text-3xl sm:text-4xl font-extrabold text-[#9761df] tracking-tight">0</p>
+              <p class="text-[11px] text-[#9761df]/80 font-semibold mt-0.5">Áreas de trabajo</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros iOS Pill Style -->
         <div class="space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3 gap-3">
-            <div class="flex space-x-2 font-mono text-xs">
-              <button onclick="setFilter('all')" id="tabAll" class="px-3 py-1.5 rounded-md font-semibold transition bg-sky-600 text-white border border-sky-400/30">
-                [TODAS]
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 pb-3">
+            <div class="flex p-1.5 bg-slate-200/70 dark:bg-slate-900/80 rounded-2xl space-x-1 self-start border border-white/40 dark:border-white/5">
+              <button onclick="setFilter('all')" id="tabAll" class="px-4 py-2 rounded-xl font-extrabold text-xs transition-all bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm ios-btn">
+                Todas
               </button>
-              <button onclick="setFilter('Alta')" id="tabHigh" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent">
-                [ALTA_PRIORIDAD]
+              <button onclick="setFilter('Alta')" id="tabHigh" class="px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all ios-btn">
+                Alta Prioridad
               </button>
-              <button onclick="setFilter('Urgent')" id="tabUrgent" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent">
-                [POR_VENCER]
+              <button onclick="setFilter('Urgent')" id="tabUrgent" class="px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all ios-btn">
+                Por Vencer
               </button>
             </div>
-            <span class="text-xs font-mono text-slate-500 tracking-widest uppercase">Estatus: Requerimientos del Centro</span>
+
+            <button onclick="toggleForm()" class="ios-btn bg-gradient-to-r from-[#618dec] via-[#20d0b8] to-[#9761df] text-white font-extrabold text-xs px-5 py-2.5 rounded-2xl flex items-center justify-center space-x-2 shadow-lg shadow-[#618dec]/20">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Nueva Tarea</span>
+            </button>
           </div>
 
-          <!-- Estado de Carga -->
-          <div id="loading" class="text-center py-16 text-slate-500 space-y-3 font-mono">
-            <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-sky-500"></i>
-            <p class="text-xs tracking-widest uppercase">Sincronizando registros con Sheets DB...</p>
+          <!-- Loading State -->
+          <div id="loading" class="text-center py-16 text-slate-400 space-y-3 font-medium">
+            <div class="w-12 h-12 border-4 border-[#20d0b8] border-t-transparent rounded-full animate-spin mx-auto shadow-lg shadow-[#20d0b8]/30"></div>
+            <p class="text-xs font-bold text-slate-500 dark:text-slate-400">Sincronizando con Google Sheets...</p>
           </div>
 
-          <!-- Lista de Tareas -->
-          <div id="taskList" class="flex flex-col space-y-3 pt-1"></div>
+          <!-- Task List -->
+          <div id="taskList" class="space-y-3"></div>
         </div>
-        <!-- Métricas de Bitácora -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] uppercase mb-1">
-              <span>[TOTAL_PENDIENTES]</span>
-              <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
-            </div>
-            <p id="statTotal" class="text-2xl font-bold text-slate-900 dark:text-slate-100">0</p>
-            <div class="text-[10px] text-slate-500 mt-0.5">Registros activos</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-300 dark:border-rose-900/40 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-rose-600 dark:text-rose-400 text-[10px] uppercase mb-1">
-              <span>[PRIORIDAD_CRÍTICA]</span>
-              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i>
-            </div>
-            <p id="statHigh" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</p>
-            <div class="text-[10px] text-rose-600/80 dark:text-rose-500/80 mt-0.5">Acción inmediata</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-amber-300 dark:border-amber-900/40 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-amber-600 dark:text-amber-400 text-[10px] uppercase mb-1">
-              <span>[POR_VENCER]</span>
-              <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i>
-            </div>
-            <p id="statDue" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</p>
-            <div class="text-[10px] text-amber-700/80 dark:text-amber-500/80 mt-0.5">Fecha límite alcanzada</div>
-          </div>
-
-          <div class="bg-white/90 dark:bg-slate-900/90 border border-sky-300 dark:border-sky-900/40 p-3.5 rounded-lg shadow-xs">
-            <div class="flex items-center justify-between text-sky-600 dark:text-sky-400 text-[10px] uppercase mb-1">
-              <span>[MÓDULOS]</span>
-              <i data-lucide="grid" class="w-4 h-4 text-sky-500"></i>
-            </div>
-            <p id="statCat" class="text-2xl font-bold text-sky-600 dark:text-sky-400">0</p>
-            <div class="text-[10px] text-sky-700/80 dark:text-sky-500/80 mt-0.5">Categorías de proyecto</div>
-          </div>
-        </div>
-
-
 
       </section>
 
-      <!-- =================================================================== -->
-      <!-- TAB 1: HORARIO LECTIVO TÉCNICO -->
-      <!-- =================================================================== -->
+
+      <!-- ================= HORARIO TAB ================= -->
       <section id="tabHorario" class="hidden space-y-6">
 
-        <!-- Tabla Estilo Plano de Distribución / Horario -->
-        <div class="bg-white/95 dark:bg-slate-900/95 border border-slate-300 dark:border-slate-800 rounded-xl p-4 md:p-6 shadow-xl relative overflow-hidden transition-colors duration-200">
-          
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4 mb-4 font-mono">
+        <div class="ios-card rounded-3xl p-5 sm:p-7 overflow-hidden relative">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-5 border-b border-slate-200/80 dark:border-slate-800">
             <div>
-              <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <i data-lucide="layout-grid" class="w-5 h-5 text-sky-500"></i> DISTRIBUCIÓN SEMANAL DE CARGA LECTIVA
+              <h2 class="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="calendar" class="w-5 h-5 text-[#20d0b8]"></i> Carga Lectiva Semanal
               </h2>
-              <p class="text-xs text-slate-500 mt-0.5">PLANO TÉCNICO // CURSO 2026-2027</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Planificación de clases y espacios | Curso 2026-2027</p>
             </div>
-            <div class="text-[11px] bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded text-slate-600 dark:text-slate-300">
-              CÓDIGO: <span class="text-sky-600 dark:text-sky-400 font-bold">HOR-TYD-2627</span>
-            </div>
+            <span class="text-xs font-mono font-bold px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#20d0b8]/20 to-[#618dec]/20 text-[#139c89] dark:text-[#20d0b8] border border-[#20d0b8]/30 shadow-xs">
+              CÓD: HOR-RHV-2627
+            </span>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-center border-collapse font-mono text-xs min-w-[700px]">
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-center border-separate border-spacing-2.5 text-xs min-w-[800px]">
               <thead>
-                <tr class="bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-b-2 border-slate-300 dark:border-slate-800">
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-28">FRANJA / HORA</th>
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">LUNES</th>
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">MARTES</th>
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">MIÉRCOLES</th>
-                  <th class="p-3 border-r border-slate-300 dark:border-slate-800 w-1/5">JUEVES</th>
-                  <th class="p-3 w-1/5">VIERNES</th>
+                <tr class="text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-wider text-[11px]">
+                  <th class="p-3 w-28">Franja</th>
+                  <th class="p-3">Lunes</th>
+                  <th class="p-3">Martes</th>
+                  <th class="p-3">Miércoles</th>
+                  <th class="p-3">Jueves</th>
+                  <th class="p-3">Viernes</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                
+              <tbody class="divide-y-0">
+
                 <!-- 08:15 - 09:15 -->
                 <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">08:15 - 09:15</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO A / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                  <td class="p-2 font-mono font-bold text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl">08:15 - 09:15</td>
+                  <td class="p-1">
+                    <div class="m-eso-a p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO A</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#618dec] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A13</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A13</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO B / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-b p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO B</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#20d0b8] text-slate-900 text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A20</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A20</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO B / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-b p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO B</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#20d0b8] text-slate-900 text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A20</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A20</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C1 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-c1 p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO C1</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#61a9df] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">ATC</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • ATC</p>
                     </div>
                   </td>
-                  <td class="p-2">
-                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C1 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded" title="Crear Tarea en Bitácora">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-c1 p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO C1</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#61a9df] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A17</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A17</p>
                     </div>
                   </td>
                 </tr>
 
                 <!-- 09:15 - 10:15 -->
                 <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">09:15 - 10:15</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-guardia p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
+                  <td class="p-2 font-mono font-bold text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl">09:15 - 10:15</td>
+                  <td class="p-1">
+                    <div class="m-guardia p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
                         <span>GUARDIA</span>
-                        <button onclick="createTaskFromSchedule('Guardia 1ª Hora Lunes', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                        <button onclick="createTaskFromSchedule('Guardia Lunes 1ª', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">Servicio de Guardia</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">Servicio de Guardia</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-guardia p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
+                  <td class="p-1">
+                    <div class="m-guardia p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
                         <span>GUARDIA</span>
-                        <button onclick="createTaskFromSchedule('Guardia 2ª Hora Martes', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                        <button onclick="createTaskFromSchedule('Guardia Martes 2ª', 'Otros')" class="opacity-0 group-hover:opacity-100 transition bg-rose-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">Servicio de Guardia</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">Servicio de Guardia</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO A / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-a p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO A</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#618dec] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A13</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A13</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-tutoria p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>TUTORÍA LECTIVA</span>
-                        <button onclick="createTaskFromSchedule('Tutoría 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-tutoria p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>TUTORÍA</span>
+                        <button onclick="createTaskFromSchedule('Tutoría 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">2º ESO C A17</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">2º ESO C • Aula A17</p>
                     </div>
                   </td>
-                  <td class="p-2">
-                    <div class="cell-eso-a p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO A / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-a p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO A</span>
+                        <button onclick="createTaskFromSchedule('2º ESO A / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#618dec] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">ATC</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • ATC</p>
                     </div>
                   </td>
                 </tr>
 
                 <!-- 10:15 - 11:15 -->
                 <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">10:15 - 11:15</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO D / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-2 font-mono font-bold text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl">10:15 - 11:15</td>
+                  <td class="p-1">
+                    <div class="m-eso-d p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO D</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#dfd661] text-slate-900 text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A14</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A14</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO D / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-d p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO D</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#dfd661] text-slate-900 text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">ATC</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • ATC</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-c1 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C1 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-c1 p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO C1</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C1 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#61a9df] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">ATC</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • ATC</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>PLAN DE CENTRO</span>
-                        <button onclick="createTaskFromSchedule('Plan de Centro', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-gestion p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>PLAN CENTRO</span>
+                        <button onclick="createTaskFromSchedule('Plan de Centro', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">Otras Activ. Lectivas</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">Gestión Lectiva</p>
                     </div>
                   </td>
-                  <td class="p-2">
-                    <div class="cell-eso-b p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO B / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-b p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO B</span>
+                        <button onclick="createTaskFromSchedule('2º ESO B / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#20d0b8] text-slate-900 text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A20</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A20</p>
                     </div>
                   </td>
                 </tr>
 
-                <!-- RECREO: 11:15 - 11:45 -->
-                <tr class="bg-slate-100/60 dark:bg-slate-950/60">
-                  <td class="p-2 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800 text-[10px]">11:15 - 11:45</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-guardia p-1.5 rounded border text-[10px] font-bold">GUARDIA RECREO (ESO)</div>
+                <!-- RECREO -->
+                <tr>
+                  <td class="p-2 font-mono font-bold text-slate-400 bg-slate-200/30 dark:bg-slate-800/30 rounded-2xl">11:15 - 11:45</td>
+                  <td class="p-1">
+                    <div class="m-guardia p-2.5 rounded-2xl text-center text-[10px] font-extrabold text-rose-500 bg-rose-500/15 border border-rose-500/30">
+                      GUARDIA RECREO
+                    </div>
                   </td>
-                  <td colspan="4" class="p-2 text-slate-400 dark:text-slate-600 text-[10px] font-mono uppercase tracking-widest">// DESCANSO LECTIVO / RECREO //</td>
+                  <td colspan="4" class="p-2 text-slate-400 dark:text-slate-500 text-[11px] font-bold tracking-widest uppercase">
+                    — DESCANSO LECTIVO / RECREO —
+                  </td>
                 </tr>
 
                 <!-- 11:45 - 12:45 -->
                 <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">11:45 - 12:45</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-tutoria p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>TUTORÍA ATENCIÓN</span>
-                        <button onclick="createTaskFromSchedule('Atención Familias 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-2 font-mono font-bold text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl">11:45 - 12:45</td>
+                  <td class="p-1">
+                    <div class="m-tutoria p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>ATENCIÓN</span>
+                        <button onclick="createTaskFromSchedule('Atención Familias 2º ESO C', 'Tutoría')" class="opacity-0 group-hover:opacity-100 transition bg-pink-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">Personalizada 2º ESO C</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">Atención Familias</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C2 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-c2 p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO C2</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#9761df] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A18</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A18</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700 text-[10px]">- LIBRE -</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C2 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1 text-slate-400 text-[10px] font-bold uppercase tracking-wider">- LIBRE -</td>
+                  <td class="p-1">
+                    <div class="m-eso-c2 p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO C2</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#9761df] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A18</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A18</p>
                     </div>
                   </td>
-                  <td class="p-2">
-                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
+                  <td class="p-1">
+                    <div class="m-gestion p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
                         <span>PROGRAMACIÓN</span>
-                        <button onclick="createTaskFromSchedule('Programación de Actividades', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                        <button onclick="createTaskFromSchedule('Programación de Actividades', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">Actividades Educativas</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">Gestión Docente</p>
                     </div>
                   </td>
                 </tr>
 
                 <!-- 12:45 - 13:45 -->
                 <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">12:45 - 13:45</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
+                  <td class="p-2 font-mono font-bold text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl">12:45 - 13:45</td>
+                  <td class="p-1">
+                    <div class="m-gestion p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
                         <span>COORDINACIÓN</span>
-                        <button onclick="createTaskFromSchedule('Coordinación Docente / Materiales', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                        <button onclick="createTaskFromSchedule('Coordinación Docente', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">Docente / Materiales</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">Materiales / Coord.</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700 text-[10px]">- LIBRE -</td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-gestion p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
+                  <td class="p-1 text-slate-400 text-[10px] font-bold uppercase tracking-wider">- LIBRE -</td>
+                  <td class="p-1">
+                    <div class="m-gestion p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
                         <span>REDEP</span>
-                        <button onclick="createTaskFromSchedule('Reunión REDEP', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                        <button onclick="createTaskFromSchedule('Reunión REDEP', 'Gestión')" class="opacity-0 group-hover:opacity-100 transition bg-slate-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">Reunión Dep.</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">Reunión Dpto.</p>
                     </div>
                   </td>
-                  <td class="p-2 border-r border-slate-200 dark:border-slate-800">
-                    <div class="cell-eso-d p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO D / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-d p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO D</span>
+                        <button onclick="createTaskFromSchedule('2º ESO D / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#dfd661] text-slate-900 text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A14</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A14</p>
                     </div>
                   </td>
-                  <td class="p-2">
-                    <div class="cell-eso-c2 p-2.5 rounded border text-left space-y-1 relative group">
-                      <div class="font-bold flex justify-between items-center">
-                        <span>2º ESO C2 / TYD</span>
-                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-sky-600 text-white text-[9px] px-1.5 py-0.5 rounded">+ BITÁCORA</button>
+                  <td class="p-1">
+                    <div class="m-eso-c2 p-3.5 rounded-2xl text-left space-y-1 relative group ios-btn shadow-xs">
+                      <div class="font-extrabold text-slate-900 dark:text-white flex justify-between items-center">
+                        <span>2º ESO C2</span>
+                        <button onclick="createTaskFromSchedule('2º ESO C2 / TYD', 'Clases')" class="opacity-0 group-hover:opacity-100 transition bg-[#9761df] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-lg shadow">+ BITÁCORA</button>
                       </div>
-                      <div class="text-[10px] opacity-80">A18</div>
+                      <p class="text-[10px] text-slate-600 dark:text-slate-300 font-semibold">TYD • Aula A18</p>
                     </div>
                   </td>
-                </tr>
-
-                <!-- 13:45 - 14:45 -->
-                <tr>
-                  <td class="p-2 bg-slate-50 dark:bg-slate-950 font-bold text-slate-500 border-r border-slate-300 dark:border-slate-800">13:45 - 14:45</td>
-                  <td colspan="5" class="p-2 text-slate-400 dark:text-slate-700 text-[10px] font-mono tracking-widest">// SIN CARGA LECTIVA ASIGNADA //</td>
                 </tr>
 
               </tbody>
             </table>
           </div>
 
-          <!-- Leyenda Técnica de Capas/Colores -->
-          <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-3 font-mono text-[11px]">
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-a inline-block border"></span> 2º ESO A</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-b inline-block border"></span> 2º ESO B</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-c1 inline-block border"></span> 2º ESO C1</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-c2 inline-block border"></span> 2º ESO C2</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-eso-d inline-block border"></span> 2º ESO D</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-guardia inline-block border"></span> Guardias</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-tutoria inline-block border"></span> Tutorías</div>
-            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded cell-gestion inline-block border"></span> Coordinación / Gestión</div>
+          <!-- Leyenda de colores -->
+          <div class="mt-6 pt-4 border-t border-slate-200/80 dark:border-slate-800 flex flex-wrap gap-4 text-xs font-bold">
+            <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 rounded-full bg-[#618dec] shadow-xs"></span><span class="text-slate-700 dark:text-slate-300">2º ESO A</span></div>
+            <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 rounded-full bg-[#20d0b8] shadow-xs"></span><span class="text-slate-700 dark:text-slate-300">2º ESO B</span></div>
+            <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 rounded-full bg-[#61a9df] shadow-xs"></span><span class="text-slate-700 dark:text-slate-300">2º ESO C1</span></div>
+            <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 rounded-full bg-[#9761df] shadow-xs"></span><span class="text-slate-700 dark:text-slate-300">2º ESO C2</span></div>
+            <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 rounded-full bg-[#dfd661] shadow-xs"></span><span class="text-slate-700 dark:text-slate-300">2º ESO D</span></div>
+            <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 rounded-full bg-rose-500 shadow-xs"></span><span class="text-slate-700 dark:text-slate-300">Guardias</span></div>
+            <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 rounded-full bg-pink-500 shadow-xs"></span><span class="text-slate-700 dark:text-slate-300">Tutorías</span></div>
           </div>
 
         </div>
+
       </section>
 
     </main>
   </div>
 
-  <!-- Pie de Página / Cajetín Final de Proyecto -->
-  <footer class="bg-white dark:bg-slate-900 border-t border-slate-300 dark:border-slate-800 mt-16 py-6 relative z-10 font-mono text-xs text-slate-500 dark:text-slate-400 transition-colors duration-200">
-    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-center border border-slate-300 dark:border-slate-800 p-4 rounded-lg bg-slate-50/80 dark:bg-slate-950/60">
-      <div class="flex items-center space-x-3">
-        <div class="border border-sky-500/40 p-2 text-sky-600 dark:text-sky-400 bg-sky-500/10 rounded">
-          <i data-lucide="box" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <p class="font-bold text-slate-800 dark:text-slate-200">RHV TASKMASTER // CAD SPEC</p>
-          <p class="text-[10px] text-slate-500">SISTEMA INTEGRADO DE CONTROL Y PLANIFICACIÓN</p>
-        </div>
+  <!-- iOS Footer -->
+  <footer class="mt-12 py-6 border-t border-slate-200/80 dark:border-slate-800/80 text-xs text-slate-400 relative z-10 bg-white/40 dark:bg-slate-950/40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center space-x-2">
+        <div class="w-2.5 h-2.5 rounded-full bg-[#20d0b8] animate-ping"></div>
+        <span class="font-extrabold text-slate-700 dark:text-slate-200 tracking-wide">RHV TASKMASTER OS</span>
+        <span class="text-slate-500">• Sincronización activa</span>
       </div>
-      
-      <div class="text-center md:text-left text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5 border-y md:border-y-0 md:border-x border-slate-300 dark:border-slate-800 py-2 md:py-0 md:px-4">
-        <p><span class="text-slate-400 dark:text-slate-500">PROYECTO:</span> Horario & Bitácora RHV</p>
-        <p><span class="text-slate-400 dark:text-slate-500">ENGINE:</span> Google Sheets API v4</p>
-      </div>
-
-      <div class="text-right text-[10px] text-slate-500 space-y-0.5">
-        <p>REVISIÓN: <span class="text-slate-700 dark:text-slate-300">REV-2026/2027</span></p>
-        <p>&copy; RHV ARCHITECTURE & ENGINEERING</p>
+      <div class="text-center sm:text-right text-[11px] font-medium text-slate-500">
+        <span>Diseñado bajo los estándares de interfaz de Apple iOS 18 & visionOS</span>
       </div>
     </div>
   </footer>
 
-  <!-- Script Lógico Integrado -->
+  <!-- Script Lógico Integrado Conservado Integrógramente -->
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbuFnsJl63dcRAWZqO1vGLszyNES4lZSkkd8vPo078-wRvnavbw_UUy5OZZUmdUXWY/exec";
 
     let tasks = [];
     let currentFilter = 'all';
 
-    // Manejo de Tema (Dark / Light)
     function initTheme() {
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme === 'light') {
@@ -653,29 +762,29 @@
       lucide.createIcons();
     }
 
-    // Cambio de Pestañas (Horario / Bitácora)
     function switchTab(tab) {
-      
       const navTabHorario = document.getElementById('navTabHorario');
       const navTabBitacora = document.getElementById('navTabBitacora');
       const tabHorario = document.getElementById('tabHorario');
       const tabBitacora = document.getElementById('tabBitacora');
 
+      const activeClass = "flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center space-x-2 bg-gradient-to-r from-[#618dec] via-[#20d0b8] to-[#9761df] text-white shadow-md shadow-[#618dec]/30 sheen ios-btn";
+      const inactiveClass = "flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-300 flex items-center justify-center space-x-2 ios-btn";
+
       if (tab === 'bitacora') {
         tabBitacora.classList.remove('hidden');
         tabHorario.classList.add('hidden');
-        navTabBitacora.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md";
-        navTabHorario.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2";
+        navTabBitacora.className = activeClass;
+        navTabHorario.className = inactiveClass;
       } else {
         tabBitacora.classList.add('hidden');
         tabHorario.classList.remove('hidden');
-        navTabHorario.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-md";
-        navTabBitacora.className = "flex-1 sm:flex-none px-4 py-2 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2";
+        navTabHorario.className = activeClass;
+        navTabBitacora.className = inactiveClass;
       }
       lucide.createIcons();
     }
 
-    // Conexión Horario -> Bitácora
     function createTaskFromSchedule(materia, categoria) {
       switchTab('bitacora');
       const form = document.getElementById('formContainer');
@@ -716,7 +825,7 @@
       e.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>REGISTRANDO...</span>';
+      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Guardando...</span>';
       lucide.createIcons();
 
       const newTask = {
@@ -742,7 +851,7 @@
         alert("Error al guardar registro: " + err.message);
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i data-lucide="check-square" class="w-4 h-4"></i><span>REGISTRAR EN BITÁCORA</span>';
+        submitBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>Registrar Tarea</span>';
         lucide.createIcons();
       }
     });
@@ -767,13 +876,16 @@
       currentFilter = filter;
       const tabs = { 'all': 'tabAll', 'Alta': 'tabHigh', 'Urgent': 'tabUrgent' };
 
+      const activeBtnClass = "px-4 py-2 rounded-xl font-extrabold text-xs transition-all bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm ios-btn";
+      const inactiveBtnClass = "px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all ios-btn";
+
       Object.values(tabs).forEach(tabId => {
         const btn = document.getElementById(tabId);
-        btn.className = "px-3 py-1.5 rounded-md font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition border border-transparent";
+        btn.className = inactiveBtnClass;
       });
 
       const activeBtn = document.getElementById(tabs[filter]);
-      activeBtn.className = "px-3 py-1.5 rounded-md font-semibold transition bg-sky-600 text-white border border-sky-400/30";
+      activeBtn.className = activeBtnClass;
 
       renderTasks();
     }
@@ -802,21 +914,23 @@
       if (!Array.isArray(filtered) || filtered.length === 0) {
         list.className = "block";
         list.innerHTML = `
-          <div class="text-center py-16 bg-white/70 dark:bg-slate-900/50 rounded-lg border border-dashed border-slate-300 dark:border-slate-800 font-mono">
-            <i data-lucide="check-circle-2" class="w-10 h-10 text-slate-400 dark:text-slate-600 mx-auto mb-2"></i>
-            <p class="text-sm font-semibold text-slate-600 dark:text-slate-400">[SIN REGISTROS EN ESTE MÓDULO]</p>
-            <p class="text-xs text-slate-400 dark:text-slate-600 mt-1">Todos los requerimientos están liquidados o aprobados.</p>
+          <div class="ios-card rounded-3xl text-center py-12 px-4">
+            <div class="w-12 h-12 bg-[#20d0b8]/20 text-[#20d0b8] rounded-2xl flex items-center justify-center mx-auto mb-3 border border-[#20d0b8]/30">
+              <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-extrabold text-slate-800 dark:text-white">¡Todo al día!</p>
+            <p class="text-xs text-slate-400 mt-1">No hay tareas pendientes registradas en este filtro.</p>
           </div>`;
         lucide.createIcons();
         return;
       }
 
-      list.className = "flex flex-col space-y-3 pt-1";
+      list.className = "space-y-3";
 
       const prioBadge = {
-        'Alta': 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800/60',
-        'Media': 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800/60',
-        'Baja': 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/60'
+        'Alta': 'bg-rose-500/15 text-rose-500 border-rose-500/30',
+        'Media': 'bg-[#dfd661]/25 text-[#9a9117] dark:text-[#dfd661] border-[#dfd661]/40',
+        'Baja': 'bg-[#20d0b8]/15 text-[#139c89] dark:text-[#20d0b8] border-[#20d0b8]/30'
       };
 
       filtered.forEach((task, idx) => {
@@ -824,32 +938,32 @@
         const codeNum = String(idx + 1).padStart(2, '0');
         
         const item = document.createElement('div');
-        item.className = `blueprint-card rounded-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full shadow-xs`;
+        item.className = `ios-card rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4`;
         
         item.innerHTML = `
-          <div class="flex items-start gap-3 flex-grow pl-2">
-            <span class="font-mono text-xs font-bold text-sky-700 dark:text-sky-400 bg-sky-100 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-800 px-2 py-1 rounded flex-shrink-0">
-              #REC-${codeNum}
-            </span>
+          <div class="flex items-start gap-3.5 flex-grow">
+            <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#618dec] via-[#20d0b8] to-[#9761df] text-white flex items-center justify-center font-extrabold font-mono text-xs shadow-md shadow-[#618dec]/20 flex-shrink-0 mt-0.5">
+              ${codeNum}
+            </div>
             <div class="space-y-1">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="font-medium text-slate-800 dark:text-slate-100 text-sm md:text-base leading-snug">${task.descripcion}</span>
-                ${isOverdue ? '<span class="font-mono text-[10px] bg-rose-600 text-white font-extrabold px-2 py-0.5 rounded tracking-wider uppercase">¡FECHA CRÍTICA!</span>' : ''}
+                <span class="font-bold text-slate-900 dark:text-slate-100 text-sm md:text-base leading-snug">${task.descripcion}</span>
+                ${isOverdue ? '<span class="text-[10px] bg-rose-500 text-white font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">¡Vencida!</span>' : ''}
               </div>
             </div>
           </div>
 
-          <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200 dark:border-slate-800 flex-shrink-0 font-mono">
-            <div class="flex items-center gap-2 text-xs">
-              <span class="px-2.5 py-1 rounded border text-[10px] font-bold bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700">${task.categoria}</span>
-              <span class="px-2.5 py-1 rounded border text-[10px] font-bold ${prioBadge[task.prioridad]}">${task.prioridad}</span>
-              <span class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 ml-1">
-                <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> ${task.fechaLimite}
+          <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-800 flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300">${task.categoria}</span>
+              <span class="px-3 py-1 rounded-full text-[10px] font-extrabold border ${prioBadge[task.prioridad]}">${task.prioridad}</span>
+              <span class="flex items-center gap-1 text-[11px] text-slate-400 font-semibold ml-1">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#618dec]"></i> ${task.fechaLimite}
               </span>
             </div>
 
-            <button onclick="completeTask('${task.id}')" title="Marcar como Finalizado / Aprobado" 
-                    class="bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 p-2 rounded transition shadow-xs hover:scale-105">
+            <button onclick="completeTask('${task.id}')" title="Marcar como Completada" 
+                    class="ios-btn p-2.5 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500 text-emerald-500 hover:text-white border border-emerald-500/30 transition-all shadow-sm">
               <i data-lucide="check" class="w-4 h-4"></i>
             </button>
           </div>
@@ -860,7 +974,6 @@
       lucide.createIcons();
     }
 
-    // Inicializar app
     initTheme();
     document.getElementById('fechaLimite').value = new Date().toISOString().split('T')[0];
     fetchTasks();
